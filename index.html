@@ -20,11 +20,9 @@
       --orange: #f59e0b;
       --text: #e5e7eb;
       --muted: #6b7280;
-      --dim: #374151;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     html { scroll-behavior: smooth; }
 
     body {
@@ -36,104 +34,158 @@
     }
 
     #particle-canvas {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── news ticker ── */
+    .ticker {
       position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
+      bottom: 0; left: 0; right: 0;
+      height: 30px;
+      background: rgba(7,12,24,0.97);
+      border-top: 1px solid var(--border);
+      z-index: 200;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+    }
+
+    .ticker-label {
+      background: var(--gold);
+      color: #000;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 0 10px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      letter-spacing: 1px;
+    }
+
+    .ticker-track {
+      overflow: hidden;
+      flex: 1;
+    }
+
+    .ticker-inner {
+      display: inline-block;
+      white-space: nowrap;
+      animation: tickerScroll 60s linear infinite;
+      font-size: 0.72rem;
+      color: var(--muted);
+      padding-left: 40px;
+    }
+
+    .ticker-inner .t-item { margin-right: 80px; }
+    .ticker-inner .t-up   { color: var(--accent); }
+    .ticker-inner .t-down { color: var(--red); }
+
+    @keyframes tickerScroll {
+      from { transform: translateX(100vw); }
+      to   { transform: translateX(-100%); }
     }
 
     /* ── layout ── */
     .app {
-      position: relative;
-      z-index: 1;
+      position: relative; z-index: 1;
       display: grid;
       grid-template-columns: 280px 1fr 280px;
       grid-template-rows: auto 1fr;
-      gap: 0;
       min-height: 100vh;
+      padding-bottom: 30px;
     }
 
+    /* ── top bar ── */
     .top-bar {
       grid-column: 1 / -1;
-      background: rgba(7,12,24,0.95);
+      background: rgba(7,12,24,0.97);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
-      padding: 0 20px;
+      padding: 0 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 56px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      height: 52px;
+      position: sticky; top: 0; z-index: 100;
+      gap: 12px;
     }
 
-    .top-bar .brand {
-      font-size: 1.1rem;
-      font-weight: 800;
+    .brand {
+      font-size: 1rem; font-weight: 800;
       background: linear-gradient(90deg, var(--gold), var(--gold2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text;
+      white-space: nowrap;
     }
 
-    .top-bar .prestige-btn {
-      background: linear-gradient(135deg, #581c87, var(--purple));
-      border: none;
+    .top-stats {
+      display: flex; gap: 16px;
+      font-size: 0.72rem;
+    }
+
+    .top-stat { text-align: center; }
+    .top-stat .v { color: var(--gold); font-weight: 700; }
+    .top-stat .l { color: var(--muted); font-size: 0.62rem; }
+
+    .top-btns { display: flex; gap: 8px; flex-shrink: 0; }
+
+    .hdr-btn {
+      border: 1px solid var(--border);
+      background: var(--card2);
       border-radius: 8px;
-      color: #fff;
-      font-size: 0.8rem;
+      color: var(--text);
+      font-size: 0.72rem;
       font-weight: 700;
-      padding: 6px 14px;
+      padding: 5px 10px;
       cursor: pointer;
-      transition: opacity 0.2s;
-    }
-    .top-bar .prestige-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-    .top-bar .prestige-btn:not(:disabled):hover { opacity: 0.85; }
-
-    .top-bar .top-stats {
-      display: flex;
-      gap: 20px;
-      font-size: 0.78rem;
+      white-space: nowrap;
+      transition: border-color 0.15s;
     }
 
-    .top-bar .top-stat { text-align: center; }
-    .top-bar .top-stat .v { color: var(--gold); font-weight: 700; }
-    .top-bar .top-stat .l { color: var(--muted); }
+    .hdr-btn:hover:not(:disabled) { border-color: var(--gold); }
+    .hdr-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
-    /* ── left panel ── */
+    .hdr-btn.prestige-btn {
+      background: linear-gradient(135deg, #581c87, var(--purple));
+      border-color: transparent; color: #fff;
+    }
+
+    .sound-btn { font-size: 1rem; padding: 5px 8px; }
+
+    /* ── panels ── */
     .left-panel {
-      padding: 16px;
+      padding: 14px;
       border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
       overflow-y: auto;
-      max-height: calc(100vh - 56px);
-      position: sticky;
-      top: 56px;
+      max-height: calc(100vh - 52px - 30px);
+      position: sticky; top: 52px;
+      display: flex; flex-direction: column; gap: 10px;
     }
 
-    /* ── center panel ── */
     .center-panel {
-      padding: 20px;
+      padding: 16px;
       overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
+      display: flex; flex-direction: column; gap: 14px;
     }
 
-    /* ── right panel ── */
     .right-panel {
-      padding: 16px;
+      padding: 14px;
       border-left: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
       overflow-y: auto;
-      max-height: calc(100vh - 56px);
-      position: sticky;
-      top: 56px;
+      max-height: calc(100vh - 52px - 30px);
+      position: sticky; top: 52px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+
+    /* ── section label ── */
+    .sec-label {
+      font-size: 0.65rem; font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase; letter-spacing: 2px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
     }
 
     /* ── balance hero ── */
@@ -141,433 +193,378 @@
       background: linear-gradient(160deg, #0d1a2e, #111827);
       border: 1px solid var(--border);
       border-radius: 18px;
-      padding: 28px 20px;
+      padding: 24px 16px;
       text-align: center;
-      position: relative;
-      overflow: hidden;
+      position: relative; overflow: hidden;
     }
 
     .balance-hero::after {
       content: '';
-      position: absolute;
-      top: -40%;
-      left: -20%;
-      width: 140%;
-      height: 80%;
+      position: absolute; top: -40%; left: -20%; width: 140%; height: 80%;
       background: radial-gradient(ellipse, rgba(245,200,66,0.07) 0%, transparent 70%);
       pointer-events: none;
     }
 
     .bal-label {
-      font-size: 0.72rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      margin-bottom: 8px;
+      font-size: 0.65rem; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 3px; margin-bottom: 6px;
     }
 
     .bal-amount {
-      font-size: clamp(2rem, 6vw, 3.6rem);
-      font-weight: 900;
-      color: var(--gold);
-      font-variant-numeric: tabular-nums;
-      letter-spacing: -1px;
-      line-height: 1.1;
+      font-size: clamp(1.8rem, 5vw, 3.4rem);
+      font-weight: 900; color: var(--gold);
+      font-variant-numeric: tabular-nums; letter-spacing: -1px; line-height: 1.1;
       transition: transform 0.08s;
     }
 
     .bal-amount.pop { transform: scale(1.05); }
 
+    .bal-sub {
+      display: flex; align-items: center; justify-content: center;
+      gap: 6px; flex-wrap: wrap; margin-top: 8px;
+    }
+
     .bal-ptag {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
       background: rgba(245,200,66,0.08);
       border: 1px solid rgba(245,200,66,0.2);
       border-radius: 999px;
-      padding: 3px 12px;
-      font-size: 0.72rem;
-      color: var(--gold);
-      margin-top: 8px;
+      padding: 2px 10px;
+      font-size: 0.65rem; color: var(--gold);
     }
 
-    .prestige-mult {
-      display: inline-block;
-      background: rgba(168,85,247,0.15);
+    .prestige-tag {
+      background: rgba(168,85,247,0.12);
       border: 1px solid rgba(168,85,247,0.3);
       border-radius: 999px;
       padding: 2px 10px;
-      font-size: 0.7rem;
-      color: var(--purple);
-      margin-top: 6px;
-      margin-left: 6px;
+      font-size: 0.65rem; color: var(--purple);
+      display: none;
+    }
+
+    /* ── boost bar ── */
+    .boost-bar {
+      display: flex; flex-wrap: wrap; gap: 6px;
+    }
+
+    .boost-pill {
+      display: flex; align-items: center; gap: 5px;
+      background: rgba(245,200,66,0.1);
+      border: 1px solid rgba(245,200,66,0.25);
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 0.7rem; color: var(--gold);
+      animation: boostPulse 2s ease-in-out infinite;
+    }
+
+    .boost-pill .bp-bar {
+      width: 40px; height: 3px;
+      background: var(--border); border-radius: 999px; overflow: hidden;
+    }
+
+    .boost-pill .bp-fill {
+      height: 100%; background: var(--gold);
+      transition: width 0.5s linear;
+    }
+
+    @keyframes boostPulse {
+      0%,100% { opacity: 1; } 50% { opacity: 0.7; }
     }
 
     /* ── rate bar ── */
     .rate-bar {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 10px;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
     }
 
     .rate-cell {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 12px 8px;
-      text-align: center;
+      padding: 10px 8px; text-align: center;
     }
 
-    .rate-cell .rv {
-      font-size: 1.1rem;
-      font-weight: 800;
-      color: var(--accent);
+    .rate-cell .rv { font-size: 1rem; font-weight: 800; color: var(--accent); }
+    .rate-cell .rl { font-size: 0.6rem; color: var(--muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* ── milestone ── */
+    .milestone-bar {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 10px 14px;
     }
 
-    .rate-cell .rl {
-      font-size: 0.65rem;
-      color: var(--muted);
-      margin-top: 2px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+    .mb-label {
+      display: flex; justify-content: space-between;
+      font-size: 0.68rem; color: var(--muted); margin-bottom: 6px;
     }
 
-    /* ── big print button ── */
-    .print-wrap {
-      display: flex;
-      justify-content: center;
-    }
+    .mb-track { height: 5px; background: var(--border); border-radius: 999px; overflow: hidden; }
+    .mb-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--accent)); border-radius: 999px; transition: width 0.4s ease; }
+
+    /* ── print button ── */
+    .print-wrap { display: flex; justify-content: center; }
 
     .print-btn {
-      position: relative;
-      width: 160px;
-      height: 160px;
-      border-radius: 50%;
-      border: none;
+      width: 150px; height: 150px;
+      border-radius: 50%; border: none;
       background: radial-gradient(circle at 40% 35%, #065f46, #064e3b);
       box-shadow: 0 0 0 6px rgba(16,185,129,0.15), 0 0 50px rgba(16,185,129,0.2);
       cursor: pointer;
-      transition: transform 0.1s, box-shadow 0.2s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
+      transition: transform 0.08s, box-shadow 0.2s;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
       color: #fff;
-      font-size: 0.9rem;
-      font-weight: 700;
     }
 
-    .print-btn:hover {
-      box-shadow: 0 0 0 8px rgba(16,185,129,0.2), 0 0 80px rgba(16,185,129,0.35);
+    .print-btn:hover { box-shadow: 0 0 0 8px rgba(16,185,129,0.2), 0 0 80px rgba(16,185,129,0.35); }
+    .print-btn:active { transform: scale(0.92); }
+    .print-btn .p-icon { font-size: 2.8rem; line-height: 1; }
+    .print-btn .p-label { font-size: 0.65rem; color: rgba(255,255,255,0.6); }
+    .print-btn .p-sub   { font-size: 0.72rem; font-weight: 700; }
+
+    /* ── power-ups row ── */
+    .powerup-row {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
     }
 
-    .print-btn:active { transform: scale(0.93); }
-
-    .print-btn .p-icon { font-size: 3rem; line-height: 1; }
-    .print-btn .p-label { font-size: 0.75rem; color: rgba(255,255,255,0.7); }
-
-    /* ── action grid ── */
-    .action-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .action-btn {
+    .powerup-btn {
       background: var(--card2);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 14px 10px;
+      padding: 10px 6px;
       cursor: pointer;
       transition: border-color 0.15s, transform 0.1s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 5px;
-      color: var(--text);
-      font-size: 0.8rem;
-      font-weight: 600;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      color: var(--text); font-size: 0.65rem; font-weight: 600; text-align: center;
+    }
+
+    .powerup-btn:hover:not(:disabled) { border-color: var(--gold); transform: translateY(-1px); }
+    .powerup-btn:active:not(:disabled) { transform: scale(0.96); }
+    .powerup-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .powerup-btn .pu-icon { font-size: 1.4rem; }
+    .powerup-btn .pu-cost { font-size: 0.6rem; color: var(--muted); }
+
+    /* ── action grid ── */
+    .action-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    }
+
+    .action-btn {
+      background: var(--card2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 12px 8px;
+      cursor: pointer; transition: border-color 0.15s, transform 0.1s;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      color: var(--text); font-size: 0.78rem; font-weight: 600;
     }
 
     .action-btn:hover:not(:disabled) { border-color: var(--gold); transform: translateY(-1px); }
     .action-btn:active:not(:disabled) { transform: scale(0.96); }
-    .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    .action-btn .a-icon { font-size: 1.5rem; }
-    .action-btn .a-cost { font-size: 0.65rem; color: var(--muted); }
+    .action-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .action-btn .a-icon { font-size: 1.4rem; }
+    .action-btn .a-cost { font-size: 0.62rem; color: var(--muted); }
 
-    /* ── section label ── */
-    .sec-label {
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      padding-bottom: 8px;
+    /* ── tabs ── */
+    .tabs {
+      display: flex; gap: 4px;
       border-bottom: 1px solid var(--border);
+      padding-bottom: 0;
+      margin-bottom: 0;
     }
 
-    /* ── upgrades list (left panel) ── */
+    .tab {
+      padding: 6px 12px;
+      font-size: 0.72rem; font-weight: 700;
+      color: var(--muted); cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+
+    .tab.active { color: var(--gold); border-color: var(--gold); }
+    .tab-panel  { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── upgrades list ── */
     .upgrade-item {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 12px;
-      cursor: pointer;
-      transition: border-color 0.15s, transform 0.1s;
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      align-items: center;
-      gap: 10px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px;
+      cursor: pointer; transition: border-color 0.15s, transform 0.1s;
+      display: grid; grid-template-columns: auto 1fr auto;
+      align-items: center; gap: 8px;
     }
 
     .upgrade-item:hover:not(.locked) { border-color: var(--gold); }
     .upgrade-item:active:not(.locked) { transform: scale(0.98); }
-    .upgrade-item.locked { opacity: 0.38; cursor: not-allowed; }
-    .upgrade-item.maxed { border-color: var(--accent); }
+    .upgrade-item.locked  { opacity: 0.38; cursor: not-allowed; }
+    .upgrade-item.maxed   { border-color: var(--accent); cursor: default; }
 
-    .upgrade-item .u-icon { font-size: 1.4rem; }
-    .upgrade-item .u-info .u-name { font-size: 0.8rem; font-weight: 700; }
-    .upgrade-item .u-info .u-desc { font-size: 0.65rem; color: var(--muted); margin-top: 1px; }
-    .upgrade-item .u-right { text-align: right; }
-    .upgrade-item .u-cost { font-size: 0.7rem; color: var(--gold); font-weight: 600; }
-    .upgrade-item .u-owned { font-size: 0.62rem; color: var(--accent); }
+    .u-icon { font-size: 1.3rem; }
+    .u-name { font-size: 0.78rem; font-weight: 700; }
+    .u-desc { font-size: 0.62rem; color: var(--muted); margin-top: 1px; }
+    .u-cost { font-size: 0.68rem; color: var(--gold); font-weight: 600; }
+    .u-owned{ font-size: 0.6rem; color: var(--accent); }
 
-    /* ── achievements (right panel) ── */
+    /* ── achievements ── */
     .ach-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      transition: border-color 0.3s;
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 10px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; transition: border-color 0.3s;
     }
 
     .ach-item.unlocked { border-color: var(--gold); }
-    .ach-item.locked   { opacity: 0.35; filter: grayscale(1); }
+    .ach-item.locked   { opacity: 0.32; filter: grayscale(1); }
+    .ach-icon { font-size: 1.3rem; }
+    .ach-name { font-size: 0.78rem; font-weight: 700; }
+    .ach-desc { font-size: 0.62rem; color: var(--muted); margin-top: 1px; }
 
-    .ach-item .a-icon-w { font-size: 1.5rem; }
-    .ach-item .a-name { font-size: 0.8rem; font-weight: 700; }
-    .ach-item .a-desc { font-size: 0.65rem; color: var(--muted); margin-top: 1px; }
+    /* ── stats panel ── */
+    .stats-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    }
+
+    .stat-item {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 12px; text-align: center;
+    }
+
+    .stat-item .sv { font-size: 1rem; font-weight: 800; color: var(--accent); }
+    .stat-item .sl { font-size: 0.62rem; color: var(--muted); margin-top: 2px; }
 
     /* ── log ── */
     .log-wrap {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      overflow: hidden;
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
     }
 
     .log-hdr {
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      padding: 8px 14px; border-bottom: 1px solid var(--border);
+      font-size: 0.65rem; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 1px;
+      display: flex; justify-content: space-between; align-items: center;
     }
 
-    .log-clear { cursor: pointer; color: var(--red); font-size: 0.65rem; }
+    .log-clear { cursor: pointer; color: var(--red); }
 
     .log-scroll {
-      max-height: 200px;
-      overflow-y: auto;
-      scrollbar-width: thin;
-      scrollbar-color: var(--border) transparent;
+      max-height: 180px; overflow-y: auto;
+      scrollbar-width: thin; scrollbar-color: var(--border) transparent;
     }
 
     .log-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 16px;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.78rem;
-      animation: fadeSlide 0.25s ease;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 7px 14px; border-bottom: 1px solid var(--border);
+      font-size: 0.75rem; animation: fadeSlide 0.2s ease;
     }
 
     .log-row:last-child { border-bottom: none; }
-    .log-row .lr-desc { color: var(--text); }
-    .log-row .lr-time { color: var(--muted); font-size: 0.65rem; }
-    .log-row .lr-amt  { font-weight: 700; white-space: nowrap; margin-left: 12px; }
-    .lr-pos { color: var(--accent); }
-    .lr-neg { color: var(--red); }
-    .lr-neu { color: var(--muted); }
+    .lr-desc { color: var(--text); }
+    .lr-time { color: var(--muted); font-size: 0.6rem; margin-top: 1px; }
+    .lr-amt  { font-weight: 700; white-space: nowrap; margin-left: 10px; }
+    .lr-pos  { color: var(--accent); }
+    .lr-neg  { color: var(--red); }
+    .lr-neu  { color: var(--muted); }
 
     /* ── event banner ── */
     #event-banner {
-      position: fixed;
-      top: 64px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-80px);
+      position: fixed; top: 60px; left: 50%;
+      transform: translateX(-50%) translateY(-100px);
       background: linear-gradient(135deg, #1f2937, #111827);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px 24px;
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: var(--text);
-      z-index: 500;
+      border: 1px solid var(--border); border-radius: 14px;
+      padding: 12px 22px; font-size: 0.9rem; font-weight: 700;
+      color: var(--text); z-index: 500;
       transition: transform 0.4s cubic-bezier(.34,1.56,.64,1);
-      text-align: center;
-      max-width: 380px;
-      width: calc(100% - 40px);
+      text-align: center; max-width: 360px; width: calc(100% - 32px);
+      pointer-events: none;
     }
 
     #event-banner.show { transform: translateX(-50%) translateY(0); }
-    #event-banner .eb-title { font-size: 1.1rem; margin-bottom: 4px; }
-    #event-banner .eb-desc  { font-size: 0.78rem; color: var(--muted); }
+    .eb-title { font-size: 1rem; margin-bottom: 3px; }
+    .eb-desc  { font-size: 0.72rem; color: var(--muted); }
 
-    /* ── prestige modal ── */
+    /* ── offline modal ── */
     .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(4px);
-      z-index: 900;
-      display: none;
-      align-items: center;
-      justify-content: center;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+      z-index: 900; display: none;
+      align-items: center; justify-content: center;
     }
 
     .modal-overlay.open { display: flex; }
 
     .modal {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 32px;
-      max-width: 420px;
-      width: calc(100% - 32px);
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 28px;
+      max-width: 400px; width: calc(100% - 32px);
       text-align: center;
     }
 
-    .modal h2 { font-size: 1.5rem; margin-bottom: 8px; color: var(--purple); }
-    .modal p  { font-size: 0.88rem; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
-
-    .modal .modal-stat {
-      background: var(--dark2);
-      border-radius: 10px;
-      padding: 14px;
-      margin-bottom: 20px;
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--purple);
-    }
-
-    .modal-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-    .modal-btns button {
-      border: none;
-      border-radius: 12px;
-      padding: 12px;
-      font-size: 0.9rem;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
+    .modal h2 { font-size: 1.4rem; margin-bottom: 8px; }
+    .modal p  { font-size: 0.85rem; color: var(--muted); margin-bottom: 16px; line-height: 1.6; }
+    .modal .modal-stat { background: var(--dark2); border-radius: 10px; padding: 12px; margin-bottom: 16px; font-size: 1.1rem; font-weight: 700; }
+    .modal-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .modal-btns button { border: none; border-radius: 10px; padding: 11px; font-size: 0.88rem; font-weight: 700; cursor: pointer; }
     .btn-confirm { background: linear-gradient(135deg, #581c87, var(--purple)); color: #fff; }
     .btn-cancel  { background: var(--card2); color: var(--text); border: 1px solid var(--border); }
-
-    /* ── milestone bar ── */
-    .milestone-bar {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px 16px;
-    }
-
-    .milestone-bar .mb-label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.72rem;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-
-    .mb-track {
-      height: 6px;
-      background: var(--border);
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .mb-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--gold), var(--accent));
-      border-radius: 999px;
-      transition: width 0.4s ease;
-    }
+    .btn-ok { background: linear-gradient(135deg, #065f46, var(--accent)); color: #fff; grid-column: span 2; }
 
     /* ── toast ── */
     #toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: var(--card2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 10px 22px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text);
-      z-index: 800;
-      transition: transform 0.3s cubic-bezier(.34,1.56,.64,1);
-      white-space: nowrap;
-      pointer-events: none;
+      position: fixed; bottom: 40px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--card2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 9px 20px;
+      font-size: 0.82rem; font-weight: 600; color: var(--text);
+      z-index: 800; transition: transform 0.3s cubic-bezier(.34,1.56,.64,1);
+      white-space: nowrap; pointer-events: none;
     }
 
     #toast.show { transform: translateX(-50%) translateY(0); }
 
-    /* ── floating +number ── */
+    /* ── floating +num ── */
     .float-num {
-      position: fixed;
-      pointer-events: none;
-      font-size: 1rem;
-      font-weight: 800;
-      color: var(--gold);
-      z-index: 600;
-      animation: floatUp 1.1s ease forwards;
+      position: fixed; pointer-events: none;
+      font-size: 1rem; font-weight: 800; color: var(--gold);
+      z-index: 600; animation: floatUp 1s ease forwards;
       text-shadow: 0 2px 8px rgba(0,0,0,0.8);
     }
 
     @keyframes floatUp {
       0%   { opacity: 1; transform: translateY(0) scale(1); }
-      100% { opacity: 0; transform: translateY(-80px) scale(0.7); }
+      100% { opacity: 0; transform: translateY(-70px) scale(0.7); }
     }
 
     @keyframes fadeSlide {
-      from { opacity: 0; transform: translateX(-10px); }
+      from { opacity: 0; transform: translateX(-8px); }
       to   { opacity: 1; transform: translateX(0); }
     }
 
-    /* ── scrollbar ── */
+    /* ── keyboard hints ── */
+    .kb-hints {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      justify-content: center;
+    }
+
+    .kb-hint {
+      font-size: 0.62rem; color: var(--muted);
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 6px; padding: 2px 7px;
+    }
+
+    .kb-hint kbd {
+      color: var(--gold); font-family: monospace;
+    }
+
+    /* ── scrollbars ── */
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
 
-    /* ── responsive ── */
-    @media (max-width: 900px) {
-      .app {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto;
-      }
-
+    /* ── mobile ── */
+    @media (max-width: 860px) {
+      .app { grid-template-columns: 1fr; }
       .left-panel, .right-panel {
-        max-height: none;
-        position: static;
-        border: none;
-        border-top: 1px solid var(--border);
+        max-height: none; position: static;
+        border: none; border-top: 1px solid var(--border);
       }
-
-      .top-bar .top-stats { display: none; }
+      .top-stats { display: none; }
+      .powerup-row { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
@@ -575,73 +572,101 @@
 
 <canvas id="particle-canvas"></canvas>
 
-<div id="event-banner">
-  <div class="eb-title" id="eb-title">📰 Breaking News</div>
-  <div class="eb-desc" id="eb-desc">Market event!</div>
+<!-- News ticker -->
+<div class="ticker">
+  <div class="ticker-label">📰 PTM NEWS</div>
+  <div class="ticker-track">
+    <div class="ticker-inner" id="ticker-inner"></div>
+  </div>
 </div>
 
-<!-- Prestige Modal -->
+<!-- Event banner -->
+<div id="event-banner">
+  <div class="eb-title" id="eb-title"></div>
+  <div class="eb-desc"  id="eb-desc"></div>
+</div>
+
+<!-- Prestige modal -->
 <div class="modal-overlay" id="prestige-modal">
   <div class="modal">
     <h2>🌟 Prestige Reset</h2>
-    <p>Reset your vault to earn <strong>Phantom Tokens</strong> — permanent multipliers that make your next run much faster.</p>
-    <div class="modal-stat" id="prestige-reward-display">+1 Phantom Token</div>
-    <p style="font-size:0.78rem;color:var(--muted);margin-top:-12px;">Each token boosts ALL earnings by ×1.5</p>
+    <p>Reset your vault to earn <strong>Phantom Tokens</strong> — permanent multipliers that accelerate every future run.</p>
+    <div class="modal-stat" id="prestige-reward-display"></div>
+    <p style="font-size:0.75rem;color:var(--muted);margin:-8px 0 16px">Each token multiplies ALL earnings by ×1.5</p>
     <div class="modal-btns">
       <button class="btn-confirm" onclick="doPrestige()">Confirm Prestige</button>
-      <button class="btn-cancel"  onclick="closePrestige()">Not Yet</button>
+      <button class="btn-cancel"  onclick="closeModal('prestige-modal')">Not Yet</button>
     </div>
   </div>
 </div>
 
+<!-- Offline earnings modal -->
+<div class="modal-overlay" id="offline-modal">
+  <div class="modal">
+    <h2>💤 Welcome Back!</h2>
+    <p id="offline-msg"></p>
+    <div class="modal-stat" id="offline-reward"></div>
+    <div class="modal-btns">
+      <button class="btn-ok" onclick="collectOffline()">Collect Earnings</button>
+    </div>
+  </div>
+</div>
+
+<!-- Main app -->
 <div class="app">
 
-  <!-- ── top bar ── -->
+  <!-- Top bar -->
   <header class="top-bar">
     <div class="brand">💰 Phantomark Bank</div>
     <div class="top-stats" id="top-stats"></div>
-    <button class="prestige-btn" id="prestige-btn" onclick="openPrestige()" disabled>
-      🌟 Prestige
-    </button>
+    <div class="top-btns">
+      <button class="hdr-btn sound-btn" id="sound-btn" onclick="toggleSound()" title="Toggle sound">🔊</button>
+      <button class="hdr-btn" onclick="openStats()">📊 Stats</button>
+      <button class="hdr-btn prestige-btn" id="prestige-btn" onclick="openPrestige()" disabled>🌟 Prestige</button>
+    </div>
   </header>
 
-  <!-- ── left panel : upgrades ── -->
-  <aside class="left-panel" id="left-panel">
-    <div class="sec-label">Upgrades</div>
-    <div id="upgrades-list"></div>
+  <!-- Left panel: upgrades -->
+  <aside class="left-panel">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('tab-upgrades',this)">Upgrades</div>
+      <div class="tab"        onclick="switchTab('tab-shop',this)">Shop</div>
+    </div>
+    <div class="tab-panel active" id="tab-upgrades">
+      <div style="height:10px"></div>
+      <div id="upgrades-list"></div>
+    </div>
+    <div class="tab-panel" id="tab-shop">
+      <div style="height:10px"></div>
+      <div id="shop-list"></div>
+    </div>
   </aside>
 
-  <!-- ── center panel ── -->
+  <!-- Center panel -->
   <main class="center-panel">
 
-    <!-- balance -->
+    <!-- Balance -->
     <div class="balance-hero">
       <div class="bal-label">Phantomarks Balance</div>
       <div class="bal-amount" id="bal-amt">0</div>
-      <div>
+      <div class="bal-sub">
         <span class="bal-ptag">PTM · Not legal tender anywhere in the universe</span>
-        <span class="prestige-mult" id="prestige-tag" style="display:none"></span>
+        <span class="prestige-tag" id="prestige-tag"></span>
       </div>
     </div>
 
-    <!-- rates -->
+    <!-- Active boosts -->
+    <div class="boost-bar" id="boost-bar"></div>
+
+    <!-- Rates -->
     <div class="rate-bar">
-      <div class="rate-cell">
-        <div class="rv" id="r-click">+1</div>
-        <div class="rl">Per Click</div>
-      </div>
-      <div class="rate-cell">
-        <div class="rv" id="r-sec">0</div>
-        <div class="rl">PTM / sec</div>
-      </div>
-      <div class="rate-cell">
-        <div class="rv" id="r-all">0</div>
-        <div class="rl">All Time</div>
-      </div>
+      <div class="rate-cell"><div class="rv" id="r-click">+1</div><div class="rl">Per Click</div></div>
+      <div class="rate-cell"><div class="rv" id="r-sec">0</div><div class="rl">PTM / sec</div></div>
+      <div class="rate-cell"><div class="rv" id="r-all">0</div><div class="rl">All Time</div></div>
     </div>
 
-    <!-- milestone -->
-    <div class="milestone-bar" id="milestone-bar">
+    <!-- Milestone -->
+    <div class="milestone-bar">
       <div class="mb-label">
         <span id="ms-label">Next milestone</span>
         <span id="ms-pct">0%</span>
@@ -649,50 +674,74 @@
       <div class="mb-track"><div class="mb-fill" id="ms-fill" style="width:0%"></div></div>
     </div>
 
-    <!-- big print button -->
+    <!-- Print button -->
     <div class="print-wrap">
-      <button class="print-btn" id="print-btn" onclick="printMoney(event)">
+      <button class="print-btn" onclick="printMoney(event)">
         <span class="p-icon">🖨️</span>
-        <span>PRINT</span>
-        <span class="p-label" id="p-label">+1 PTM per click</span>
+        <span class="p-sub">PRINT</span>
+        <span class="p-label" id="p-label">+1 PTM</span>
       </button>
     </div>
 
-    <!-- action buttons -->
+    <!-- Power-ups -->
+    <div class="powerup-row">
+      <button class="powerup-btn" id="pu-frenzy"  onclick="activatePowerup('frenzy',event)">
+        <span class="pu-icon">⚡</span>
+        <span>Print Frenzy</span>
+        <span class="pu-cost" id="pu-cost-frenzy"></span>
+      </button>
+      <button class="powerup-btn" id="pu-jackpot" onclick="activatePowerup('jackpot',event)">
+        <span class="pu-icon">💫</span>
+        <span>Jackpot Mode</span>
+        <span class="pu-cost" id="pu-cost-jackpot"></span>
+      </button>
+      <button class="powerup-btn" id="pu-auto"    onclick="activatePowerup('auto',event)">
+        <span class="pu-icon">🤖</span>
+        <span>Auto Overdrive</span>
+        <span class="pu-cost" id="pu-cost-auto"></span>
+      </button>
+      <button class="powerup-btn" id="pu-ghost"   onclick="activatePowerup('ghost',event)">
+        <span class="pu-icon">👻</span>
+        <span>Ghost Market</span>
+        <span class="pu-cost" id="pu-cost-ghost"></span>
+      </button>
+    </div>
+
+    <!-- Actions -->
     <div class="action-grid">
-      <button class="action-btn" id="btn-double" onclick="doublePrint(event)">
+      <button class="action-btn" onclick="doublePrint(event)">
         <span class="a-icon">✖️2</span>
         <span>Double Print</span>
         <span class="a-cost" id="cost-double"></span>
       </button>
-      <button class="action-btn" id="btn-invest" onclick="investMoney(event)">
+      <button class="action-btn" onclick="investMoney(event)">
         <span class="a-icon">📈</span>
         <span>Invest 30%</span>
         <span class="a-cost" id="cost-invest"></span>
       </button>
-      <button class="action-btn" id="btn-lotto" onclick="buyLotto(event)">
+      <button class="action-btn" onclick="buyLotto(event)">
         <span class="a-icon">🎰</span>
         <span>Phantom Lottery</span>
         <span class="a-cost" id="cost-lotto"></span>
       </button>
-      <button class="action-btn" id="btn-heist" onclick="doHeist(event)">
+      <button class="action-btn" onclick="doHeist(event)">
         <span class="a-icon">🦹</span>
         <span>Phantom Heist</span>
         <span class="a-cost" id="cost-heist"></span>
       </button>
-      <button class="action-btn" id="btn-tax" onclick="taxRefund()">
+      <button class="action-btn" onclick="taxRefund()">
         <span class="a-icon">🏛️</span>
         <span>Tax Refund</span>
         <span class="a-cost">5% of all-time</span>
       </button>
-      <button class="action-btn" id="btn-reset" onclick="confirmReset()">
+      <button class="action-btn" onclick="confirmReset()">
         <span class="a-icon">🗑️</span>
         <span>Reset Vault</span>
         <span class="a-cost">Wipe balance</span>
       </button>
     </div>
 
-    <!-- log -->
+    <!-- Transaction log -->
     <div class="log-wrap">
       <div class="log-hdr">
         Transaction History
@@ -700,21 +749,38 @@
       </div>
       <div class="log-scroll" id="log-scroll">
         <div class="log-row">
-          <div>
-            <div class="lr-desc">Account opened — welcome to Phantomark Bank!</div>
-            <div class="lr-time">Just now</div>
-          </div>
+          <div><div class="lr-desc">Account opened — welcome to Phantomark Bank!</div><div class="lr-time">Just now</div></div>
           <div class="lr-amt lr-neu">—</div>
         </div>
       </div>
     </div>
 
+    <!-- Keyboard hints -->
+    <div class="kb-hints">
+      <span class="kb-hint"><kbd>Space</kbd> Print</span>
+      <span class="kb-hint"><kbd>D</kbd> Double</span>
+      <span class="kb-hint"><kbd>I</kbd> Invest</span>
+      <span class="kb-hint"><kbd>L</kbd> Lottery</span>
+      <span class="kb-hint"><kbd>H</kbd> Heist</span>
+      <span class="kb-hint"><kbd>1-4</kbd> Power-ups</span>
+    </div>
+
   </main>
 
-  <!-- ── right panel : achievements ── -->
-  <aside class="right-panel" id="right-panel">
-    <div class="sec-label">Achievements (<span id="ach-count">0</span>/<span id="ach-total">0</span>)</div>
-    <div id="ach-list"></div>
+  <!-- Right panel: achievements + stats -->
+  <aside class="right-panel">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('tab-ach',this)">Achievements (<span id="ach-count">0</span>)</div>
+      <div class="tab"        onclick="switchTab('tab-stats',this)">Stats</div>
+    </div>
+    <div class="tab-panel active" id="tab-ach">
+      <div style="height:10px"></div>
+      <div id="ach-list"></div>
+    </div>
+    <div class="tab-panel" id="tab-stats">
+      <div style="height:10px"></div>
+      <div class="stats-grid" id="stats-grid"></div>
+    </div>
   </aside>
 
 </div>
@@ -722,126 +788,204 @@
 <div id="toast"></div>
 
 <script>
-// ──────────────────────────────────────────────
-// DATA DEFINITIONS
-// ──────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────
+// STATIC DATA
+// ──────────────────────────────────────────────────────────
 const UPGRADES = [
-  { id:'inkjet',     icon:'🖨️',  name:'Inkjet Printer',       desc:'+5 per click',         baseCost:50,     type:'click',  power:5,    max:10 },
-  { id:'laser',      icon:'⚡',   name:'Laser Press',          desc:'+25 per click',        baseCost:300,    type:'click',  power:25,   max:8  },
-  { id:'speedpress', icon:'🚀',   name:'Speed Press',          desc:'+100 per click',       baseCost:2500,   type:'click',  power:100,  max:6  },
-  { id:'hypergun',   icon:'🔫',   name:'Hyper Print-Gun',      desc:'+500 per click',       baseCost:25000,  type:'click',  power:500,  max:5  },
-  { id:'quanclick',  icon:'🌌',   name:'Quantum Clicker',      desc:'+5000 per click',      baseCost:500000, type:'click',  power:5000, max:3  },
-  { id:'robot',      icon:'🤖',   name:'Robot Worker',         desc:'+2 PTM/sec',           baseCost:150,    type:'auto',   power:2,    max:20 },
-  { id:'factory',    icon:'🏭',   name:'Ghost Factory',        desc:'+15 PTM/sec',          baseCost:1000,   type:'auto',   power:15,   max:15 },
-  { id:'miner',      icon:'⛏️',   name:'Phantom Miner',        desc:'+80 PTM/sec',          baseCost:8000,   type:'auto',   power:80,   max:10 },
-  { id:'satellite',  icon:'🛸',   name:'Money Satellite',      desc:'+400 PTM/sec',         baseCost:60000,  type:'auto',   power:400,  max:8  },
-  { id:'quantum',    icon:'🌀',   name:'Quantum Duplicator',   desc:'+2000 PTM/sec',        baseCost:500000, type:'auto',   power:2000, max:5  },
-  { id:'blackhole',  icon:'🕳️',  name:'Money Black Hole',     desc:'+20000 PTM/sec',       baseCost:5000000,type:'auto',  power:20000,max:3  },
+  { id:'inkjet',    icon:'🖨️', name:'Inkjet Printer',      desc:'+5 per click',      baseCost:50,      type:'click', power:5,     max:10 },
+  { id:'laser',     icon:'⚡',  name:'Laser Press',         desc:'+25 per click',     baseCost:300,     type:'click', power:25,    max:8  },
+  { id:'speedpress',icon:'🚀',  name:'Speed Press',         desc:'+100 per click',    baseCost:2500,    type:'click', power:100,   max:6  },
+  { id:'hypergun',  icon:'🔫',  name:'Hyper Print-Gun',     desc:'+500 per click',    baseCost:25000,   type:'click', power:500,   max:5  },
+  { id:'quanclick', icon:'🌌',  name:'Quantum Clicker',     desc:'+5000 per click',   baseCost:500000,  type:'click', power:5000,  max:3  },
+  { id:'robot',     icon:'🤖',  name:'Robot Worker',        desc:'+2 PTM/sec',        baseCost:150,     type:'auto',  power:2,     max:20 },
+  { id:'factory',   icon:'🏭',  name:'Ghost Factory',       desc:'+15 PTM/sec',       baseCost:1000,    type:'auto',  power:15,    max:15 },
+  { id:'miner',     icon:'⛏️',  name:'Phantom Miner',       desc:'+80 PTM/sec',       baseCost:8000,    type:'auto',  power:80,    max:10 },
+  { id:'satellite', icon:'🛸',  name:'Money Satellite',     desc:'+400 PTM/sec',      baseCost:60000,   type:'auto',  power:400,   max:8  },
+  { id:'quantum',   icon:'🌀',  name:'Quantum Duplicator',  desc:'+2000 PTM/sec',     baseCost:500000,  type:'auto',  power:2000,  max:5  },
+  { id:'blackhole', icon:'🕳️', name:'Money Black Hole',    desc:'+20000 PTM/sec',    baseCost:5000000, type:'auto',  power:20000, max:3  },
+];
+
+const SHOP_ITEMS = [
+  { id:'goldInk',    icon:'🖊️', name:'Gold Ink',         desc:'Click power ×2 permanently',  cost:5000,    effect: s => { s.clickPower *= 2; } },
+  { id:'turbo',      icon:'🏎️', name:'Turbo Engine',     desc:'Auto rate ×2 permanently',     cost:10000,   effect: s => { s.autoPerSec *= 2; } },
+  { id:'vault',      icon:'🏛️', name:'Phantom Vault',    desc:'Max offline time → 24h',       cost:50000,   effect: s => { s.offlineCap = 86400; } },
+  { id:'insurance',  icon:'🛡️', name:'Crash Insurance',  desc:'Block next market crash',      cost:20000,   effect: s => { s.crashShield++; } },
+  { id:'megaPress',  icon:'🏗️', name:'Mega Press Array', desc:'Click power ×10 permanently',  cost:1000000, effect: s => { s.clickPower *= 10; } },
+  { id:'darkMarket', icon:'🌑', name:'Dark Market Pass', desc:'Heist success rate → 85%',     cost:500000,  effect: s => { s.heistRate = 0.85; } },
 ];
 
 const ACHIEVEMENTS = [
-  { id:'first',    icon:'🥇', name:'First Print',         desc:'Print your first PTM',         check: s => s.allTime >= 1        },
-  { id:'hundred',  icon:'💯', name:'Centurion',           desc:'Earn 100 PTM',                 check: s => s.allTime >= 100      },
-  { id:'thousand', icon:'🔢', name:'Thousandaire',        desc:'Earn 1,000 PTM',               check: s => s.allTime >= 1000     },
-  { id:'million',  icon:'💎', name:'Phantom Millionaire', desc:'Earn 1,000,000 PTM',           check: s => s.allTime >= 1e6      },
-  { id:'billion',  icon:'🌟', name:'Phantom Billionaire', desc:'Earn 1,000,000,000 PTM',       check: s => s.allTime >= 1e9      },
-  { id:'trillion', icon:'🚀', name:'Phantom Trillionaire',desc:'Earn 1 Trillion PTM',          check: s => s.allTime >= 1e12     },
-  { id:'quadril',  icon:'🌌', name:'Beyond Imagination',  desc:'Earn 1 Quadrillion PTM',       check: s => s.allTime >= 1e15     },
-  { id:'invest1',  icon:'📈', name:'First Investor',      desc:'Make your first investment',   check: s => s.investCount >= 1    },
-  { id:'invest10', icon:'📊', name:'Wall Street Ghost',   desc:'Invest 10 times',              check: s => s.investCount >= 10   },
-  { id:'lotto1',   icon:'🎰', name:'Lucky Draw',          desc:'Win the phantom lottery',      check: s => s.lottoWins >= 1      },
-  { id:'lotto5',   icon:'🍀', name:'Fortune Favoured',    desc:'Win the lottery 5 times',      check: s => s.lottoWins >= 5      },
-  { id:'heist1',   icon:'🦹', name:'Phantom Burglar',     desc:'Complete a heist',             check: s => s.heistCount >= 1     },
-  { id:'prestige1',icon:'🌟', name:'Reborn',              desc:'Prestige for the first time',  check: s => s.prestigeTokens >= 1 },
-  { id:'prestige5',icon:'👑', name:'Phantom Legend',      desc:'Prestige 5 times',             check: s => s.prestigeTokens >= 5 },
-  { id:'upgrade5', icon:'🔧', name:'Upgrade Addict',      desc:'Buy 5 upgrades',               check: s => s.totalUpgrades >= 5  },
-  { id:'upgrade20',icon:'🏗️', name:'Industrial Ghost',   desc:'Buy 20 upgrades',              check: s => s.totalUpgrades >= 20 },
-  { id:'click100', icon:'👆', name:'Dedicated Printer',   desc:'Click 100 times',              check: s => s.clickCount >= 100   },
-  { id:'click1000',icon:'⚡', name:'Click Master',        desc:'Click 1000 times',             check: s => s.clickCount >= 1000  },
-  { id:'autorich', icon:'🤖', name:'Passive Income',      desc:'Reach 1000 PTM/sec auto',      check: s => s.autoPerSec >= 1000  },
-  { id:'tax',      icon:'🏛️', name:'Tax Benefits',        desc:'Claim a tax refund',           check: s => s.taxCount >= 1       },
+  { id:'first',    icon:'🥇', name:'First Print',         desc:'Print your first PTM',              check: s => s.allTime >= 1         },
+  { id:'hundred',  icon:'💯', name:'Centurion',           desc:'Earn 100 PTM',                      check: s => s.allTime >= 100       },
+  { id:'thousand', icon:'🔢', name:'Thousandaire',        desc:'Earn 1,000 PTM',                    check: s => s.allTime >= 1000      },
+  { id:'million',  icon:'💎', name:'Phantom Millionaire', desc:'Earn 1,000,000 PTM',                check: s => s.allTime >= 1e6       },
+  { id:'billion',  icon:'🌟', name:'Phantom Billionaire', desc:'Earn 1,000,000,000 PTM',            check: s => s.allTime >= 1e9       },
+  { id:'trillion', icon:'🚀', name:'Phantom Trillionaire',desc:'Earn 1 Trillion PTM',               check: s => s.allTime >= 1e12      },
+  { id:'quadril',  icon:'🌌', name:'Beyond Imagination',  desc:'Earn 1 Quadrillion PTM',            check: s => s.allTime >= 1e15      },
+  { id:'invest1',  icon:'📈', name:'First Investor',      desc:'Make your first investment',        check: s => s.investCount >= 1     },
+  { id:'invest10', icon:'📊', name:'Wall Street Ghost',   desc:'Invest 10 times',                   check: s => s.investCount >= 10    },
+  { id:'lotto1',   icon:'🎰', name:'Lucky Draw',          desc:'Win the phantom lottery',           check: s => s.lottoWins >= 1       },
+  { id:'lotto5',   icon:'🍀', name:'Fortune Favoured',    desc:'Win the lottery 5 times',           check: s => s.lottoWins >= 5       },
+  { id:'heist1',   icon:'🦹', name:'Phantom Burglar',     desc:'Complete a successful heist',       check: s => s.heistCount >= 1      },
+  { id:'heist10',  icon:'🥷', name:'Master Thief',        desc:'Complete 10 heists',                check: s => s.heistCount >= 10     },
+  { id:'prestige1',icon:'🌟', name:'Reborn',              desc:'Prestige for the first time',       check: s => s.prestigeTokens >= 1  },
+  { id:'prestige5',icon:'👑', name:'Phantom Legend',      desc:'Prestige 5 times',                  check: s => s.prestigeTokens >= 5  },
+  { id:'upgrade5', icon:'🔧', name:'Upgrade Addict',      desc:'Buy 5 upgrades',                    check: s => s.totalUpgrades >= 5   },
+  { id:'upgrade20',icon:'🏗️', name:'Industrial Ghost',   desc:'Buy 20 upgrades',                   check: s => s.totalUpgrades >= 20  },
+  { id:'click100', icon:'👆', name:'Dedicated Printer',   desc:'Click 100 times',                   check: s => s.clickCount >= 100    },
+  { id:'click1000',icon:'⚡', name:'Click Master',        desc:'Click 1000 times',                  check: s => s.clickCount >= 1000   },
+  { id:'autorich', icon:'🤖', name:'Passive Income',      desc:'Reach 1000 PTM/sec auto',           check: s => s.autoPerSec >= 1000   },
+  { id:'tax',      icon:'🏛️', name:'Tax Benefits',        desc:'Claim a tax refund',                check: s => s.taxCount >= 1        },
+  { id:'boost1',   icon:'⚡', name:'Power Surge',         desc:'Activate a power-up',               check: s => s.powerupCount >= 1    },
+  { id:'boost10',  icon:'🔋', name:'Boost Junkie',        desc:'Activate 10 power-ups',             check: s => s.powerupCount >= 10   },
+  { id:'offline',  icon:'💤', name:'While You Slept',     desc:'Collect offline earnings',          check: s => s.offlineCollects >= 1 },
 ];
 
-const MILESTONES = [
-  100, 1000, 10000, 100000, 1e6, 1e7, 1e8, 1e9, 1e10, 1e12, 1e15, 1e18
-];
+const MILESTONES = [100, 1000, 10000, 1e5, 1e6, 1e7, 1e8, 1e9, 1e10, 1e12, 1e15, 1e18];
 
 const RANDOM_EVENTS = [
-  { title:'💸 Phantom Windfall!',   desc:'A mysterious envelope arrived.',         mult: 10,   type:'bonus'  },
-  { title:'🎲 Luck of the Void',    desc:'Reality glitched in your favor.',        mult: 5,    type:'bonus'  },
-  { title:'🏦 Phantom Bailout',     desc:'Imaginary government saved the economy.',mult: 8,    type:'bonus'  },
-  { title:'🌍 Fictional GDP Surge', desc:'Phantomland economy booming!',           mult: 15,   type:'bonus'  },
-  { title:'📉 Phantom Crash!',      desc:'Imaginary markets tanked.',              mult: 0.5,  type:'crash'  },
-  { title:'🔥 Printer Malfunction', desc:'Your press needs servicing.',            mult: 0.75, type:'crash'  },
-  { title:'💰 Infinite Supply!',    desc:'New PTM reserves discovered.',           mult: 20,   type:'bonus'  },
+  { title:'💸 Phantom Windfall!',    desc:'A mysterious envelope arrived.',          type:'bonus', mult:10  },
+  { title:'🎲 Reality Glitch',       desc:'Laws of finance bent in your favour.',    type:'bonus', mult:5   },
+  { title:'🏦 Phantomland Bailout',  desc:'Imaginary government saved you.',         type:'bonus', mult:8   },
+  { title:'🌍 Fictional GDP Surge',  desc:'Phantomland economy is booming!',         type:'bonus', mult:15  },
+  { title:'💰 Hidden Reserves',      desc:'New PTM deposits discovered.',            type:'bonus', mult:20  },
+  { title:'🎪 Carnival of Cash',     desc:'PTM rains from the imagination sky.',     type:'bonus', mult:12  },
+  { title:'📉 Phantom Market Crash', desc:'Imaginary markets tanked briefly.',       type:'crash', mult:0.5 },
+  { title:'🔥 Printer Malfunction',  desc:'Your press overheated.',                 type:'crash', mult:0.8 },
+  { title:'💨 Phantom Inflation',    desc:'PTM value dropped momentarily.',         type:'crash', mult:0.7 },
 ];
 
-// ──────────────────────────────────────────────
+const TICKER_ITEMS = [
+  'PTM/USD: 0.00 ▶ Analysts remain baffled',
+  'Phantomland GDP hits new record — 100% fictional',
+  'Ghost Factory output up 300% quarter-on-quarter',
+  'Quantum Duplicators sold out — waitlist forming',
+  'IMF: "We have no jurisdiction over PTM"',
+  'Phantom Lottery jackpot unclaimed for 3rd week',
+  'Black Hole Bank acquires rival void bank',
+  'Economists: "This currency should not exist"',
+  'Robot workers demand raises — paid in imaginary wages',
+  'PTM declared official currency of nowhere',
+  'Phantomark Index closes at ∞ — markets confused',
+  'Breaking: More money printed than exists in known universe',
+  'Space investors eyeing PTM for interplanetary trade',
+  'Phantom heist crew turns themselves in — all charges fictional',
+  'Tax authority: "We cannot tax what does not exist"',
+];
+
+const POWERUPS = {
+  frenzy: { name:'Print Frenzy', icon:'⚡', desc:'Click power ×10 for 15s', dur:15, baseCost:500,  mult: s => s.clickPower *= 10,  undo: s => s.clickPower /= 10  },
+  jackpot:{ name:'Jackpot Mode', icon:'💫', desc:'All earnings ×5 for 20s',  dur:20, baseCost:2000, mult: s => s.jackpot = 5,        undo: s => s.jackpot = 1       },
+  auto:   { name:'Auto Overdrive',icon:'🤖',desc:'Auto rate ×8 for 30s',     dur:30, baseCost:3000, mult: s => s.autoBoost = 8,      undo: s => s.autoBoost = 1     },
+  ghost:  { name:'Ghost Market', icon:'👻', desc:'Invest returns ×3 for 25s', dur:25, baseCost:5000, mult: s => s.ghostMarket = 3,    undo: s => s.ghostMarket = 1   },
+};
+
+// ──────────────────────────────────────────────────────────
 // STATE
-// ──────────────────────────────────────────────
-const DEFAULT_STATE = () => ({
-  balance: 0,
-  allTime: 0,
-  clickPower: 1,
-  autoPerSec: 0,
-  prestigeTokens: 0,
-  prestigeMult: 1,
-  investCount: 0,
-  lottoWins: 0,
-  heistCount: 0,
-  taxCount: 0,
-  clickCount: 0,
-  totalUpgrades: 0,
-  achievements: [],
-  upgrades: Object.fromEntries(UPGRADES.map(u => [u.id, { bought: 0, cost: u.baseCost }])),
-});
+// ──────────────────────────────────────────────────────────
+function defaultState() {
+  return {
+    balance: 0, allTime: 0,
+    clickPower: 1, autoPerSec: 0,
+    prestigeTokens: 0, prestigeMult: 1,
+    jackpot: 1, autoBoost: 1, ghostMarket: 1,
+    heistRate: 0.6, crashShield: 0, offlineCap: 3600,
+    investCount: 0, lottoWins: 0, heistCount: 0,
+    taxCount: 0, clickCount: 0, totalUpgrades: 0,
+    powerupCount: 0, offlineCollects: 0,
+    achievements: [], shopBought: [],
+    lastSave: Date.now(),
+    upgrades: Object.fromEntries(UPGRADES.map(u => [u.id, { bought:0, cost:u.baseCost }])),
+    powerupCooldowns: { frenzy:0, jackpot:0, auto:0, ghost:0 },
+    activeBoosts: [],
+  };
+}
 
 let S = loadState();
 
-// ──────────────────────────────────────────────
-// PERSISTENCE
-// ──────────────────────────────────────────────
 function saveState() {
-  try { localStorage.setItem('phantomark_v2', JSON.stringify(S)); } catch(e) {}
+  try {
+    S.lastSave = Date.now();
+    localStorage.setItem('phantomark_v3', JSON.stringify(S));
+  } catch(e) {}
 }
 
 function loadState() {
   try {
-    const raw = localStorage.getItem('phantomark_v2');
-    if (raw) return { ...DEFAULT_STATE(), ...JSON.parse(raw) };
+    const raw = localStorage.getItem('phantomark_v3');
+    if (raw) {
+      const saved = JSON.parse(raw);
+      return { ...defaultState(), ...saved };
+    }
   } catch(e) {}
-  return DEFAULT_STATE();
+  return defaultState();
 }
 
-// ──────────────────────────────────────────────
-// FORMATTING
-// ──────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────
+// OFFLINE EARNINGS
+// ──────────────────────────────────────────────────────────
+let pendingOffline = 0;
+
+function checkOfflineEarnings() {
+  const elapsed = Math.floor((Date.now() - (S.lastSave || Date.now())) / 1000);
+  const capped  = Math.min(elapsed, S.offlineCap || 3600);
+  if (capped < 10 || S.autoPerSec <= 0) return;
+  const raw = S.autoPerSec * capped;
+  pendingOffline = Math.floor(raw * S.prestigeMult * 0.5); // 50% offline efficiency
+  const h = Math.floor(capped / 3600);
+  const m = Math.floor((capped % 3600) / 60);
+  const timeStr = h > 0 ? `${h}h ${m}m` : `${m}m`;
+  document.getElementById('offline-msg').textContent =
+    `You were away for ${timeStr}. Your auto-printers kept running at 50% efficiency.`;
+  document.getElementById('offline-reward').textContent =
+    `+${fmt(pendingOffline)} PTM`;
+  document.getElementById('offline-modal').classList.add('open');
+}
+
+function collectOffline() {
+  if (pendingOffline > 0) {
+    S.balance += pendingOffline;
+    S.allTime  += pendingOffline;
+    S.offlineCollects++;
+    addLog('Offline earnings collected', '+' + fmt(pendingOffline) + ' PTM', 'lr-pos');
+    spawnBills(20);
+    toast(`💤 Collected ${fmt(pendingOffline)} PTM offline earnings!`);
+    pendingOffline = 0;
+    checkAchievements();
+    render();
+  }
+  closeModal('offline-modal');
+}
+
+// ──────────────────────────────────────────────────────────
+// HELPERS
+// ──────────────────────────────────────────────────────────
 function fmt(n) {
   n = Math.floor(n);
-  if (n >= 1e18) return (n / 1e18).toFixed(2) + ' Quintillion';
-  if (n >= 1e15) return (n / 1e15).toFixed(2) + ' Quadrillion';
-  if (n >= 1e12) return (n / 1e12).toFixed(2) + ' Trillion';
-  if (n >= 1e9)  return (n / 1e9).toFixed(2)  + ' Billion';
-  if (n >= 1e6)  return (n / 1e6).toFixed(2)  + ' Million';
-  if (n >= 1e3)  return (n / 1e3).toFixed(1)  + 'K';
+  if (n >= 1e18) return (n/1e18).toFixed(2)+' Quintillion';
+  if (n >= 1e15) return (n/1e15).toFixed(2)+' Quadrillion';
+  if (n >= 1e12) return (n/1e12).toFixed(2)+' Trillion';
+  if (n >= 1e9)  return (n/1e9) .toFixed(2)+' Billion';
+  if (n >= 1e6)  return (n/1e6) .toFixed(2)+' Million';
+  if (n >= 1e3)  return (n/1e3) .toFixed(1)+'K';
   return n.toLocaleString();
 }
 
-function now() { return new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' }); }
+function nowStr() { return new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' }); }
 
-// ──────────────────────────────────────────────
+function applyMult(n)    { return Math.floor(n * S.prestigeMult * S.jackpot); }
+function autoRate()      { return Math.floor(S.autoPerSec * S.autoBoost * S.prestigeMult * S.jackpot); }
+
+// ──────────────────────────────────────────────────────────
 // EARN / SPEND
-// ──────────────────────────────────────────────
-function applyMult(n) { return Math.floor(n * S.prestigeMult); }
-
-function earn(raw, label) {
+// ──────────────────────────────────────────────────────────
+function earn(raw, label, skipLog) {
   const amount = applyMult(raw);
-  S.balance  += amount;
+  S.balance += amount;
   S.allTime  += amount;
-  addLog(label, '+' + fmt(amount) + ' PTM', 'lr-pos');
+  if (!skipLog) addLog(label, '+' + fmt(amount) + ' PTM', 'lr-pos');
   popBalance();
   checkAchievements();
-  render();
   return amount;
 }
 
@@ -849,89 +993,82 @@ function spend(amount, label) {
   if (S.balance < amount) return false;
   S.balance -= amount;
   addLog(label, '-' + fmt(amount) + ' PTM', 'lr-neg');
-  render();
   return true;
 }
 
-// ──────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────
 // ACTIONS
-// ──────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────
 function printMoney(evt) {
   S.clickCount++;
   const amt = earn(S.clickPower, 'Printed Phantomarks');
   if (evt) spawnFloatNum('+' + fmt(amt), evt.clientX, evt.clientY);
-  spawnBills(Math.min(6, 2 + Math.floor(Math.log10(S.clickPower + 1))));
+  spawnBills(Math.min(8, 2 + Math.floor(Math.log10(S.clickPower + 1))));
+  playSound('click');
+  render();
 }
 
 function doublePrint(evt) {
   const cost = applyMult(Math.max(20, S.clickPower * 3));
   if (S.balance < cost) { toast('⚠️ Need ' + fmt(cost) + ' PTM'); return; }
   spend(cost, 'Double Print fee');
-  const amt = earn(S.clickPower * 2, 'Double Print activation');
+  const amt = earn(S.clickPower * 2, 'Double Print');
   if (evt) spawnFloatNum('+' + fmt(amt), evt.clientX, evt.clientY);
-  spawnBills(10);
+  spawnBills(10); playSound('cash'); render();
 }
 
 function investMoney(evt) {
   const pot = Math.floor(S.balance * 0.3);
   if (pot < 1) { toast('⚠️ Need more PTM!'); return; }
   spend(pot, 'Investment stake (30%)');
-  const mult = 0.3 + Math.random() * 2.8;
-  const returns = Math.floor(pot * mult);
+  const mult = (0.3 + Math.random() * 2.8) * S.ghostMarket;
+  const ret  = Math.floor(pot * mult);
   S.investCount++;
   setTimeout(() => {
-    earn(returns, `Investment return (×${mult.toFixed(2)})`);
-    if (mult >= 1.5) {
-      toast(`📈 Profit! ×${mult.toFixed(2)} = +${fmt(returns)} PTM`);
-      spawnBills(12);
-    } else {
-      toast(`📉 Loss: ×${mult.toFixed(2)} — better luck next time`);
-    }
-    if (evt) spawnFloatNum((mult >= 1 ? '+' : '') + fmt(returns - pot), evt.clientX, evt.clientY);
-    checkAchievements();
-  }, 800);
+    earn(ret, `Investment return (×${mult.toFixed(2)})`);
+    if (mult >= 1) { toast(`📈 Profit! ×${mult.toFixed(2)} = +${fmt(ret)} PTM`); spawnBills(10); playSound('cash'); }
+    else           { toast(`📉 Loss: ×${mult.toFixed(2)}`); playSound('fail'); }
+    if (evt) spawnFloatNum((mult>=1?'+':'')+fmt(ret-pot), evt.clientX, evt.clientY);
+    checkAchievements(); render();
+  }, 700);
 }
 
 function buyLotto(evt) {
   const ticket = Math.max(100, Math.floor(S.allTime * 0.001 + 100));
   if (!spend(ticket, 'Lottery ticket')) { toast('⚠️ Need ' + fmt(ticket) + ' PTM'); return; }
+  playSound('click');
   const roll = Math.random();
-  let prize = 0, msg = '';
-  if      (roll < 0.005) { prize = ticket * 1000; msg = '🎉 JACKPOT! ×1000'; S.lottoWins++; }
-  else if (roll < 0.05)  { prize = ticket * 50;   msg = '🥇 Big win! ×50';  S.lottoWins++; }
-  else if (roll < 0.2)   { prize = ticket * 5;    msg = '🎫 Small win ×5';  S.lottoWins++; }
-  else                   { prize = 0;              msg = '😞 No luck this time'; }
   setTimeout(() => {
-    if (prize > 0) {
-      earn(prize, 'Lottery prize');
-      toast(msg + ' — ' + fmt(prize) + ' PTM!');
-      spawnBills(20);
-    } else {
-      toast(msg);
-    }
-    if (evt) spawnFloatNum(prize > 0 ? '+' + fmt(prize) : '💸', evt.clientX, evt.clientY);
-    checkAchievements();
+    let prize = 0, msg = '';
+    if      (roll < 0.005) { prize = ticket*1000; msg = '🎉 JACKPOT! ×1000'; S.lottoWins++; }
+    else if (roll < 0.05)  { prize = ticket*50;   msg = '🥇 Big Win ×50';   S.lottoWins++; }
+    else if (roll < 0.2)   { prize = ticket*5;    msg = '🎫 Small Win ×5';  S.lottoWins++; }
+    else                   { msg = '😞 No luck'; }
+    if (prize > 0) { earn(prize, 'Lottery prize'); toast(msg + ' — +' + fmt(prize) + ' PTM!'); spawnBills(15); playSound('jackpot'); }
+    else           { toast(msg); playSound('fail'); }
+    if (evt) spawnFloatNum(prize > 0 ? '+'+fmt(prize) : '💸', evt.clientX, evt.clientY);
+    checkAchievements(); render();
   }, 600);
 }
 
 function doHeist(evt) {
   const cost = Math.max(500, Math.floor(S.allTime * 0.02 + 500));
   if (!spend(cost, 'Heist crew fee')) { toast('⚠️ Need ' + fmt(cost) + ' PTM'); return; }
-  const success = Math.random() < 0.6;
-  S.heistCount++;
+  playSound('click');
   setTimeout(() => {
-    if (success) {
+    if (Math.random() < (S.heistRate || 0.6)) {
       const loot = Math.floor(cost * (3 + Math.random() * 5));
+      S.heistCount++;
       earn(loot, 'Phantom Heist loot');
       toast(`🦹 Heist SUCCESS! +${fmt(loot)} PTM`);
-      spawnBills(15);
-      if (evt) spawnFloatNum('+' + fmt(loot), evt.clientX, evt.clientY);
+      spawnBills(15); playSound('jackpot');
+      if (evt) spawnFloatNum('+'+fmt(loot), evt.clientX, evt.clientY);
     } else {
-      toast('🚔 Heist FAILED! Crew arrested by imaginary police.');
+      toast('🚔 Heist FAILED! Imaginary police foiled you.'); playSound('fail');
       if (evt) spawnFloatNum('🚔 Busted!', evt.clientX, evt.clientY);
     }
-    checkAchievements();
-  }, 1000);
+    checkAchievements(); render();
+  }, 900);
 }
 
 function taxRefund() {
@@ -939,17 +1076,14 @@ function taxRefund() {
   S.taxCount++;
   earn(refund, 'Phantomland Tax Refund (5%)');
   toast(`🏛️ Refund: +${fmt(refund)} PTM`);
-  spawnBills(6);
-  checkAchievements();
+  spawnBills(6); playSound('cash');
+  checkAchievements(); render();
 }
 
 function confirmReset() {
-  if (!confirm('Wipe ALL Phantomarks? This cannot be undone.')) return;
-  const fresh = DEFAULT_STATE();
-  fresh.prestigeTokens = S.prestigeTokens;
-  fresh.prestigeMult   = S.prestigeMult;
-  fresh.achievements   = S.achievements;
-  S = fresh;
+  if (!confirm('Wipe ALL Phantomarks? Prestige & achievements are kept.')) return;
+  const keep = { prestigeTokens:S.prestigeTokens, prestigeMult:S.prestigeMult, achievements:S.achievements };
+  S = { ...defaultState(), ...keep };
   saveState();
   document.getElementById('log-scroll').innerHTML = '';
   addLog('Vault wiped — fresh start', '— PTM', 'lr-neu');
@@ -957,9 +1091,43 @@ function confirmReset() {
   render();
 }
 
-// ──────────────────────────────────────────────
-// UPGRADES
-// ──────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────
+// POWER-UPS
+// ──────────────────────────────────────────────────────────
+function powerupCost(id) {
+  return Math.max(POWERUPS[id].baseCost, Math.floor(S.allTime * 0.005 + POWERUPS[id].baseCost));
+}
+
+function activatePowerup(id, evt) {
+  const pu   = POWERUPS[id];
+  const cost = powerupCost(id);
+  const now  = Date.now();
+  if (S.powerupCooldowns[id] > now) { toast(`⏱️ ${pu.name} on cooldown`); return; }
+  if (!spend(cost, `Power-up: ${pu.name}`)) { toast('⚠️ Need ' + fmt(cost) + ' PTM'); return; }
+
+  S.powerupCount++;
+  pu.mult(S);
+  S.powerupCooldowns[id] = now + pu.dur * 1000 * 3; // cooldown = 3× duration
+
+  S.activeBoosts = S.activeBoosts.filter(b => b.id !== id);
+  S.activeBoosts.push({ id, name:pu.name, icon:pu.icon, end: now + pu.dur * 1000, dur: pu.dur * 1000 });
+
+  setTimeout(() => {
+    pu.undo(S);
+    S.activeBoosts = S.activeBoosts.filter(b => b.id !== id);
+    toast(`${pu.icon} ${pu.name} expired`);
+    renderBoosts(); render();
+  }, pu.dur * 1000);
+
+  toast(`${pu.icon} ${pu.name} ACTIVE for ${pu.dur}s!`);
+  spawnBills(8); playSound('boost');
+  if (evt) spawnFloatNum(pu.icon + ' BOOST!', evt.clientX, evt.clientY);
+  checkAchievements(); render();
+}
+
+// ──────────────────────────────────────────────────────────
+// UPGRADES & SHOP
+// ──────────────────────────────────────────────────────────
 function buyUpgrade(id) {
   const def = UPGRADES.find(u => u.id === id);
   const st  = S.upgrades[id];
@@ -971,13 +1139,24 @@ function buyUpgrade(id) {
   if (def.type === 'auto')  S.autoPerSec += def.power;
   st.cost = Math.floor(st.cost * 1.65);
   toast(`${def.icon} ${def.name} (×${st.bought})`);
-  checkAchievements();
+  playSound('upgrade');
+  checkAchievements(); render();
+}
+
+function buyShopItem(id) {
+  const item = SHOP_ITEMS.find(i => i.id === id);
+  if (!item || S.shopBought.includes(id)) return;
+  if (!spend(item.cost, `Shop: ${item.name}`)) { toast('⚠️ Need ' + fmt(item.cost) + ' PTM'); return; }
+  S.shopBought.push(id);
+  item.effect(S);
+  toast(`${item.icon} ${item.name} purchased!`);
+  playSound('upgrade');
   render();
 }
 
-// ──────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────
 // PRESTIGE
-// ──────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────
 const PRESTIGE_THRESHOLD = 1e9;
 
 function prestigeReward() {
@@ -986,37 +1165,38 @@ function prestigeReward() {
 
 function openPrestige() {
   if (S.allTime < PRESTIGE_THRESHOLD) return;
+  const reward = prestigeReward();
+  const newMult = (1.5 ** (S.prestigeTokens + reward)).toFixed(2);
   document.getElementById('prestige-reward-display').textContent =
-    `+${prestigeReward()} Phantom Token(s) → total ×${(1.5 ** (S.prestigeTokens + prestigeReward())).toFixed(2)} multiplier`;
+    `+${reward} Phantom Token(s) → ×${newMult} multiplier`;
   document.getElementById('prestige-modal').classList.add('open');
-}
-
-function closePrestige() {
-  document.getElementById('prestige-modal').classList.remove('open');
 }
 
 function doPrestige() {
   const reward = prestigeReward();
   S.prestigeTokens += reward;
   S.prestigeMult    = 1.5 ** S.prestigeTokens;
-  const keep = { prestigeTokens: S.prestigeTokens, prestigeMult: S.prestigeMult, achievements: S.achievements };
-  S = { ...DEFAULT_STATE(), ...keep };
+  const keep = { prestigeTokens:S.prestigeTokens, prestigeMult:S.prestigeMult, achievements:S.achievements };
+  S = { ...defaultState(), ...keep };
   saveState();
-  closePrestige();
+  closeModal('prestige-modal');
   document.getElementById('log-scroll').innerHTML = '';
   addLog(`Prestige! ×${S.prestigeMult.toFixed(2)} multiplier active`, `+${reward} Token(s)`, 'lr-pos');
   toast(`🌟 Prestige! All earnings now ×${S.prestigeMult.toFixed(2)}`);
-  spawnBills(30);
-  checkAchievements();
-  render();
+  spawnBills(30); playSound('jackpot');
+  checkAchievements(); render();
 }
 
-// ──────────────────────────────────────────────
-// AUTO-EARN
-// ──────────────────────────────────────────────
+function openStats() { switchTabByName('tab-stats'); }
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ──────────────────────────────────────────────────────────
+// AUTO-EARN LOOP
+// ──────────────────────────────────────────────────────────
 setInterval(() => {
   if (S.autoPerSec <= 0) return;
-  const amt = applyMult(S.autoPerSec);
+  const amt = autoRate();
   S.balance += amt;
   S.allTime  += amt;
   popBalance();
@@ -1025,46 +1205,55 @@ setInterval(() => {
   saveState();
 }, 1000);
 
-// ──────────────────────────────────────────────
+// boost UI refresh
+setInterval(renderBoosts, 500);
+
+// ──────────────────────────────────────────────────────────
 // RANDOM EVENTS
-// ──────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────
 function triggerRandomEvent() {
-  if (S.allTime < 1000) return;
+  if (S.allTime < 500) return;
   const ev = RANDOM_EVENTS[Math.floor(Math.random() * RANDOM_EVENTS.length)];
-  const base = Math.floor(S.autoPerSec * 10 + S.clickPower * 5 + 100);
+  if (ev.type === 'crash' && S.crashShield > 0) {
+    S.crashShield--;
+    showEventBanner('🛡️ Crash Shielded!', 'Your insurance absorbed the market crash.');
+    toast('🛡️ Crash Insurance activated!');
+    return;
+  }
+  const base = Math.floor(S.autoPerSec * 10 + S.clickPower * 5 + 200);
   if (ev.type === 'bonus') {
     const bonus = Math.floor(base * ev.mult);
-    earn(bonus, ev.title.replace(/[^\w\s]/gu, '').trim());
+    earn(bonus, ev.title.replace(/[^\w\s]/gu,'').trim());
     toast(ev.title + ' +' + fmt(bonus) + ' PTM');
+    spawnBills(15); playSound('jackpot');
   } else {
     const loss = Math.floor(S.balance * (1 - ev.mult));
-    if (loss > 0 && S.balance > 0) {
+    if (loss > 0) {
       S.balance = Math.max(0, S.balance - loss);
-      addLog(ev.title.replace(/[^\w\s]/gu, '').trim(), '-' + fmt(loss) + ' PTM', 'lr-neg');
+      addLog(ev.title.replace(/[^\w\s]/gu,'').trim(), '-' + fmt(loss) + ' PTM', 'lr-neg');
     }
-    toast(ev.title);
+    toast(ev.title); playSound('fail');
   }
   showEventBanner(ev.title, ev.desc);
   render();
 }
 
-let eventTimer = setTimeout(scheduleEvent, 30000 + Math.random() * 60000);
 function scheduleEvent() {
-  triggerRandomEvent();
-  eventTimer = setTimeout(scheduleEvent, 45000 + Math.random() * 90000);
+  setTimeout(() => { triggerRandomEvent(); scheduleEvent(); }, 45000 + Math.random() * 90000);
 }
+scheduleEvent();
 
 function showEventBanner(title, desc) {
   document.getElementById('eb-title').textContent = title;
   document.getElementById('eb-desc').textContent  = desc;
-  const banner = document.getElementById('event-banner');
-  banner.classList.add('show');
-  setTimeout(() => banner.classList.remove('show'), 4000);
+  const b = document.getElementById('event-banner');
+  b.classList.add('show');
+  setTimeout(() => b.classList.remove('show'), 4200);
 }
 
-// ──────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────
 // ACHIEVEMENTS
-// ──────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────
 function checkAchievements() {
   let changed = false;
   for (const ach of ACHIEVEMENTS) {
@@ -1072,74 +1261,133 @@ function checkAchievements() {
       S.achievements.push(ach.id);
       changed = true;
       toast(`🏆 Achievement: ${ach.name}`);
+      playSound('upgrade');
     }
   }
   if (changed) renderAchievements();
 }
 
-// ──────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────
+// SOUND (Web Audio API)
+// ──────────────────────────────────────────────────────────
+let audioCtx = null;
+let soundOn  = true;
+
+function getCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playTone(freq, dur, type='sine', vol=0.15, detune=0) {
+  if (!soundOn) return;
+  try {
+    const ctx  = getCtx();
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    osc.detune.setValueAtTime(detune, ctx.currentTime);
+    gain.gain.setValueAtTime(vol, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + dur);
+  } catch(e) {}
+}
+
+const SOUNDS = {
+  click:   () => playTone(440, 0.06, 'square', 0.08),
+  cash:    () => { playTone(523, 0.1, 'sine',0.12); setTimeout(()=>playTone(659,0.1,'sine',0.12), 80); },
+  upgrade: () => { playTone(440,0.08,'sine',0.12); setTimeout(()=>playTone(550,0.08,'sine',0.12),70); setTimeout(()=>playTone(660,0.12,'sine',0.15),140); },
+  jackpot: () => { [523,659,784,1047].forEach((f,i)=>setTimeout(()=>playTone(f,0.15,'sine',0.15),i*70)); },
+  fail:    () => playTone(200, 0.2, 'sawtooth', 0.1),
+  boost:   () => { [330,440,550,660].forEach((f,i)=>setTimeout(()=>playTone(f,0.1,'triangle',0.12),i*50)); },
+};
+
+function playSound(name) { SOUNDS[name]?.(); }
+
+function toggleSound() {
+  soundOn = !soundOn;
+  document.getElementById('sound-btn').textContent = soundOn ? '🔊' : '🔇';
+  toast(soundOn ? '🔊 Sound on' : '🔇 Sound off');
+}
+
+// ──────────────────────────────────────────────────────────
 // LOG
-// ──────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────
 function addLog(desc, amtStr, cls) {
   const wrap = document.getElementById('log-scroll');
   const row  = document.createElement('div');
   row.className = 'log-row';
   row.innerHTML = `
-    <div>
-      <div class="lr-desc">${desc}</div>
-      <div class="lr-time">${now()}</div>
-    </div>
+    <div><div class="lr-desc">${desc}</div><div class="lr-time">${nowStr()}</div></div>
     <div class="lr-amt ${cls}">${amtStr}</div>
   `;
   wrap.prepend(row);
-  while (wrap.children.length > 50) wrap.removeChild(wrap.lastChild);
+  while (wrap.children.length > 60) wrap.removeChild(wrap.lastChild);
 }
 
-function clearLog() {
-  document.getElementById('log-scroll').innerHTML = '';
+function clearLog() { document.getElementById('log-scroll').innerHTML = ''; }
+
+// ──────────────────────────────────────────────────────────
+// TABS
+// ──────────────────────────────────────────────────────────
+function switchTab(panelId, tabEl) {
+  const parent = tabEl.closest('.left-panel, .right-panel');
+  parent.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  parent.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  tabEl.classList.add('active');
+  document.getElementById(panelId).classList.add('active');
 }
 
-// ──────────────────────────────────────────────
+function switchTabByName(panelId) {
+  const panel = document.getElementById(panelId);
+  if (!panel) return;
+  const parent = panel.closest('.left-panel, .right-panel');
+  if (!parent) return;
+  parent.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  panel.classList.add('active');
+  parent.querySelectorAll('.tab').forEach((t,i) => {
+    const panels = parent.querySelectorAll('.tab-panel');
+    t.classList.toggle('active', panels[i] === panel);
+  });
+}
+
+// ──────────────────────────────────────────────────────────
 // RENDER
-// ──────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────
 function renderBalance() {
   document.getElementById('bal-amt').textContent = fmt(S.balance);
   document.getElementById('r-click').textContent = '+' + fmt(applyMult(S.clickPower));
-  document.getElementById('r-sec').textContent   = fmt(applyMult(S.autoPerSec));
+  document.getElementById('r-sec').textContent   = fmt(autoRate());
   document.getElementById('r-all').textContent   = fmt(S.allTime);
-  document.getElementById('p-label').textContent = '+' + fmt(applyMult(S.clickPower)) + ' PTM per click';
+  document.getElementById('p-label').textContent = '+' + fmt(applyMult(S.clickPower)) + ' PTM';
 
-  // prestige tag
   const ptag = document.getElementById('prestige-tag');
   if (S.prestigeTokens > 0) {
     ptag.style.display = 'inline-block';
-    ptag.textContent   = `×${S.prestigeMult.toFixed(2)} prestige multiplier`;
-  } else {
-    ptag.style.display = 'none';
+    ptag.textContent   = `🌟 ×${S.prestigeMult.toFixed(2)} prestige`;
   }
 
-  // prestige button
-  const pbtn = document.getElementById('prestige-btn');
-  pbtn.disabled = S.allTime < PRESTIGE_THRESHOLD;
+  document.getElementById('prestige-btn').disabled = S.allTime < PRESTIGE_THRESHOLD;
 
-  // top stats
   document.getElementById('top-stats').innerHTML = `
     <div class="top-stat"><div class="v">${fmt(S.balance)}</div><div class="l">Balance</div></div>
-    <div class="top-stat"><div class="v">${fmt(applyMult(S.autoPerSec))}/s</div><div class="l">Auto</div></div>
+    <div class="top-stat"><div class="v">${fmt(autoRate())}/s</div><div class="l">Auto</div></div>
     <div class="top-stat"><div class="v">${S.prestigeTokens}</div><div class="l">Tokens</div></div>
+    <div class="top-stat"><div class="v">${fmt(S.allTime)}</div><div class="l">All Time</div></div>
   `;
 
-  // action button costs
-  document.getElementById('cost-double').textContent = 'Cost: ' + fmt(applyMult(Math.max(20, S.clickPower * 3))) + ' PTM';
-  document.getElementById('cost-invest').textContent = S.balance >= 1 ? fmt(Math.floor(S.balance * 0.3)) + ' PTM stake' : 'No balance';
-  document.getElementById('cost-lotto').textContent  = 'Ticket: ' + fmt(Math.max(100, Math.floor(S.allTime * 0.001 + 100))) + ' PTM';
-  document.getElementById('cost-heist').textContent  = 'Crew: ' + fmt(Math.max(500, Math.floor(S.allTime * 0.02 + 500))) + ' PTM';
+  document.getElementById('cost-double').textContent = 'Cost: ' + fmt(applyMult(Math.max(20, S.clickPower*3))) + ' PTM';
+  document.getElementById('cost-invest').textContent = S.balance>=1 ? fmt(Math.floor(S.balance*0.3))+' PTM stake' : 'No balance';
+  document.getElementById('cost-lotto').textContent  = 'Ticket: ' + fmt(Math.max(100, Math.floor(S.allTime*0.001+100))) + ' PTM';
+  document.getElementById('cost-heist').textContent  = 'Crew: ' + fmt(Math.max(500, Math.floor(S.allTime*0.02+500))) + ' PTM';
 
-  // milestone
   const ms = MILESTONES.find(m => S.allTime < m);
   if (ms) {
-    const prev = MILESTONES[MILESTONES.indexOf(ms) - 1] || 0;
-    const pct  = Math.min(100, ((S.allTime - prev) / (ms - prev)) * 100);
+    const prev = MILESTONES[MILESTONES.indexOf(ms)-1] || 0;
+    const pct  = Math.min(100, ((S.allTime-prev)/(ms-prev))*100);
     document.getElementById('ms-label').textContent = 'Next: ' + fmt(ms) + ' PTM';
     document.getElementById('ms-pct').textContent   = pct.toFixed(1) + '%';
     document.getElementById('ms-fill').style.width  = pct + '%';
@@ -1148,26 +1396,50 @@ function renderBalance() {
     document.getElementById('ms-pct').textContent   = '100%';
     document.getElementById('ms-fill').style.width  = '100%';
   }
+
+  const now = Date.now();
+  ['frenzy','jackpot','auto','ghost'].forEach(id => {
+    const pu  = POWERUPS[id];
+    const btn = document.getElementById('pu-' + id);
+    const cost = powerupCost(id);
+    const onCd = S.powerupCooldowns[id] > now;
+    document.getElementById('pu-cost-' + id).textContent = onCd ? 'Cooling…' : fmt(cost)+' PTM';
+    btn.disabled = onCd || S.balance < cost;
+  });
+}
+
+function renderBoosts() {
+  const bar  = document.getElementById('boost-bar');
+  const now  = Date.now();
+  S.activeBoosts = (S.activeBoosts || []).filter(b => b.end > now);
+  bar.innerHTML = '';
+  for (const b of S.activeBoosts) {
+    const pct = Math.max(0, ((b.end - now) / b.dur) * 100);
+    const pill = document.createElement('div');
+    pill.className = 'boost-pill';
+    pill.innerHTML = `
+      <span>${b.icon} ${b.name}</span>
+      <span class="bp-bar"><span class="bp-fill" style="width:${pct}%"></span></span>
+    `;
+    bar.appendChild(pill);
+  }
 }
 
 function renderUpgrades() {
   const list = document.getElementById('upgrades-list');
   list.innerHTML = '';
   for (const def of UPGRADES) {
-    const st      = S.upgrades[def.id];
-    const maxed   = st.bought >= def.max;
-    const locked  = S.balance < st.cost && !maxed;
-    const item    = document.createElement('div');
-    item.className = 'upgrade-item' + (maxed ? ' maxed' : locked ? ' locked' : '');
+    const st    = S.upgrades[def.id];
+    const maxed = st.bought >= def.max;
+    const locked = S.balance < st.cost && !maxed;
+    const item  = document.createElement('div');
+    item.className = 'upgrade-item' + (maxed?' maxed':locked?' locked':'');
     item.innerHTML = `
       <div class="u-icon">${def.icon}</div>
-      <div class="u-info">
-        <div class="u-name">${def.name}</div>
-        <div class="u-desc">${def.desc}</div>
-      </div>
-      <div class="u-right">
+      <div><div class="u-name">${def.name}</div><div class="u-desc">${def.desc}</div></div>
+      <div style="text-align:right">
         <div class="u-cost">${maxed ? '✅ MAX' : fmt(st.cost)}</div>
-        <div class="u-owned">${st.bought > 0 ? '×' + st.bought : ''}</div>
+        <div class="u-owned">${st.bought > 0 ? '×'+st.bought : ''}</div>
       </div>
     `;
     if (!locked && !maxed) item.onclick = () => buyUpgrade(def.id);
@@ -1175,45 +1447,96 @@ function renderUpgrades() {
   }
 }
 
+function renderShop() {
+  const list = document.getElementById('shop-list');
+  list.innerHTML = '';
+  for (const item of SHOP_ITEMS) {
+    const bought = S.shopBought.includes(item.id);
+    const locked = !bought && S.balance < item.cost;
+    const el = document.createElement('div');
+    el.className = 'upgrade-item' + (bought?' maxed':locked?' locked':'');
+    el.innerHTML = `
+      <div class="u-icon">${item.icon}</div>
+      <div><div class="u-name">${item.name}</div><div class="u-desc">${item.desc}</div></div>
+      <div style="text-align:right">
+        <div class="u-cost">${bought ? '✅ Owned' : fmt(item.cost)}</div>
+      </div>
+    `;
+    if (!bought && !locked) el.onclick = () => buyShopItem(item.id);
+    list.appendChild(el);
+  }
+}
+
 function renderAchievements() {
   const list = document.getElementById('ach-list');
   list.innerHTML = '';
-  let unlocked = 0;
+  let count = 0;
   for (const ach of ACHIEVEMENTS) {
     const done = S.achievements.includes(ach.id);
-    if (done) unlocked++;
+    if (done) count++;
     const item = document.createElement('div');
     item.className = 'ach-item ' + (done ? 'unlocked' : 'locked');
     item.innerHTML = `
-      <div class="a-icon-w">${ach.icon}</div>
-      <div>
-        <div class="a-name">${ach.name}</div>
-        <div class="a-desc">${ach.desc}</div>
-      </div>
+      <div class="ach-icon">${ach.icon}</div>
+      <div><div class="ach-name">${ach.name}</div><div class="ach-desc">${ach.desc}</div></div>
     `;
     list.appendChild(item);
   }
-  document.getElementById('ach-count').textContent = unlocked;
-  document.getElementById('ach-total').textContent = ACHIEVEMENTS.length;
+  document.getElementById('ach-count').textContent = count + '/' + ACHIEVEMENTS.length;
+}
+
+function renderStatsPanel() {
+  const grid = document.getElementById('stats-grid');
+  grid.innerHTML = '';
+  const rows = [
+    ['Total Clicks',    S.clickCount.toLocaleString()],
+    ['Investments',     S.investCount.toLocaleString()],
+    ['Lotto Wins',      S.lottoWins.toLocaleString()],
+    ['Heists Done',     S.heistCount.toLocaleString()],
+    ['Upgrades Bought', S.totalUpgrades.toLocaleString()],
+    ['Power-ups Used',  S.powerupCount.toLocaleString()],
+    ['Tax Refunds',     S.taxCount.toLocaleString()],
+    ['Prestige Tokens', S.prestigeTokens.toLocaleString()],
+    ['Prestige Mult',   '×' + S.prestigeMult.toFixed(2)],
+    ['Offline Collects',S.offlineCollects.toLocaleString()],
+    ['Heist Success%',  Math.round((S.heistRate || 0.6)*100) + '%'],
+    ['Achievements',    S.achievements.length + '/' + ACHIEVEMENTS.length],
+  ];
+  for (const [l, v] of rows) {
+    const el = document.createElement('div');
+    el.className = 'stat-item';
+    el.innerHTML = `<div class="sv">${v}</div><div class="sl">${l}</div>`;
+    grid.appendChild(el);
+  }
 }
 
 function render() {
   renderBalance();
   renderUpgrades();
+  renderShop();
+  renderStatsPanel();
   saveState();
 }
 
-// ──────────────────────────────────────────────
-// UI HELPERS
-// ──────────────────────────────────────────────
 function popBalance() {
   const el = document.getElementById('bal-amt');
   el.classList.remove('pop');
   void el.offsetWidth;
   el.classList.add('pop');
-  setTimeout(() => el.classList.remove('pop'), 100);
+  setTimeout(() => el.classList.remove('pop'), 90);
 }
 
+// ──────────────────────────────────────────────────────────
+// TICKER
+// ──────────────────────────────────────────────────────────
+function buildTicker() {
+  const inner = document.getElementById('ticker-inner');
+  inner.innerHTML = TICKER_ITEMS.map(t => `<span class="t-item">● ${t}</span>`).join('');
+}
+
+// ──────────────────────────────────────────────────────────
+// TOAST
+// ──────────────────────────────────────────────────────────
 let toastTimer;
 function toast(msg) {
   const el = document.getElementById('toast');
@@ -1223,31 +1546,32 @@ function toast(msg) {
   toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
 }
 
+// ──────────────────────────────────────────────────────────
+// FLOATING NUMBERS
+// ──────────────────────────────────────────────────────────
 function spawnFloatNum(text, x, y) {
   const el = document.createElement('div');
   el.className = 'float-num';
   el.textContent = text;
-  el.style.left = x + 'px';
-  el.style.top  = y + 'px';
+  el.style.left = (x - 20) + 'px';
+  el.style.top  = (y - 10) + 'px';
   document.body.appendChild(el);
-  setTimeout(() => el.remove(), 1200);
+  setTimeout(() => el.remove(), 1100);
 }
 
-// ──────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────
 // PARTICLE CANVAS
-// ──────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────
 const canvas = document.getElementById('particle-canvas');
 const ctx    = canvas.getContext('2d');
 const bills  = [];
-const BILL_CHARS = ['💵','💴','💶','💷','💸','🪙','💰'];
+const CHARS  = ['💵','💴','💶','💷','💸','🪙','💰','🏦'];
 
-function resizeCanvas() {
+(function resize() {
   canvas.width  = window.innerWidth;
   canvas.height = window.innerHeight;
-}
-
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
+  window.addEventListener('resize', resize);
+})();
 
 function spawnBills(n) {
   for (let i = 0; i < n; i++) {
@@ -1260,53 +1584,54 @@ function spawnBills(n) {
       spin: (Math.random() - 0.5) * 0.12,
       angle: Math.random() * Math.PI * 2,
       life: 1,
-      char: BILL_CHARS[Math.floor(Math.random() * BILL_CHARS.length)],
+      char: CHARS[Math.floor(Math.random() * CHARS.length)],
     });
   }
 }
 
-function animateCanvas() {
+(function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   for (let i = bills.length - 1; i >= 0; i--) {
     const b = bills[i];
-    b.y     -= b.vy;
-    b.x     += b.vx;
-    b.angle += b.spin;
-    b.life  -= 0.006;
+    b.y -= b.vy; b.x += b.vx; b.angle += b.spin; b.life -= 0.006;
     if (b.life <= 0 || b.y < -60) { bills.splice(i, 1); continue; }
     ctx.save();
     ctx.globalAlpha = Math.max(0, b.life);
     ctx.font = `${b.size}px serif`;
     ctx.translate(b.x, b.y);
     ctx.rotate(b.angle);
-    ctx.fillText(b.char, -b.size / 2, b.size / 2);
+    ctx.fillText(b.char, -b.size/2, b.size/2);
     ctx.restore();
   }
-  requestAnimationFrame(animateCanvas);
-}
+  requestAnimationFrame(animate);
+})();
 
-animateCanvas();
-
-// ambient trickle
 setInterval(() => spawnBills(S.autoPerSec > 0 ? 2 : 1), 3000);
 
-// ──────────────────────────────────────────────
-// KEYBOARD SHORTCUTS
-// ──────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────
+// KEYBOARD
+// ──────────────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
-  if (e.target.tagName === 'INPUT') return;
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
   if (e.key === ' ' || e.key === 'Enter') { printMoney(null); e.preventDefault(); }
   if (e.key === 'd') doublePrint(null);
   if (e.key === 'i') investMoney(null);
   if (e.key === 'l') buyLotto(null);
   if (e.key === 'h') doHeist(null);
+  if (e.key === '1') activatePowerup('frenzy', null);
+  if (e.key === '2') activatePowerup('jackpot', null);
+  if (e.key === '3') activatePowerup('auto', null);
+  if (e.key === '4') activatePowerup('ghost', null);
 });
 
-// ──────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────
 // INIT
-// ──────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────
+buildTicker();
+checkOfflineEarnings();
 render();
 renderAchievements();
+renderBoosts();
 spawnBills(5);
 </script>
 </body>
