@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phantomark Bank — Infinite Fictional Money</title>
+  <style>
+    :root {
+      --gold: #f5c842;
+      --dark: #0a0e1a;
+      --card: #111827;
+      --accent: #10b981;
+      --red: #ef4444;
+      --text: #e5e7eb;
+      --muted: #6b7280;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--dark);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── floating bill particles ── */
+    #particle-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+
+    /* ── header ── */
+    header {
+      text-align: center;
+      padding: 40px 0 32px;
+    }
+
+    header .logo {
+      font-size: 3rem;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--gold), #fde68a, var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    header p {
+      color: var(--muted);
+      margin-top: 6px;
+      font-size: 0.9rem;
+    }
+
+    /* ── balance card ── */
+    .balance-card {
+      background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+      border: 1px solid #374151;
+      border-radius: 20px;
+      padding: 36px;
+      text-align: center;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .balance-card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, var(--gold), transparent 60%);
+      opacity: 0.15;
+      pointer-events: none;
+    }
+
+    .balance-label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+
+    .balance-amount {
+      font-size: clamp(2.4rem, 8vw, 4rem);
+      font-weight: 900;
+      color: var(--gold);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -1px;
+      transition: transform 0.1s;
+    }
+
+    .balance-amount.pulse {
+      transform: scale(1.06);
+    }
+
+    .currency-tag {
+      display: inline-block;
+      background: rgba(245, 200, 66, 0.12);
+      border: 1px solid rgba(245, 200, 66, 0.3);
+      border-radius: 999px;
+      padding: 4px 14px;
+      font-size: 0.78rem;
+      color: var(--gold);
+      margin-top: 10px;
+      letter-spacing: 1px;
+    }
+
+    /* ── stats row ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .stat-box {
+      background: var(--card);
+      border: 1px solid #1f2937;
+      border-radius: 14px;
+      padding: 18px 12px;
+      text-align: center;
+    }
+
+    .stat-box .val {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .stat-box .lbl {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* ── action buttons ── */
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 14px;
+      padding: 18px 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn:active { transform: scale(0.96); }
+
+    .btn-print {
+      background: linear-gradient(135deg, #065f46, var(--accent));
+      color: #fff;
+      grid-column: span 2;
+      font-size: 1.2rem;
+      padding: 22px;
+      box-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-print:hover {
+      box-shadow: 0 0 50px rgba(16, 185, 129, 0.5);
+    }
+
+    .btn-double {
+      background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+      color: #fff;
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+    }
+
+    .btn-invest {
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      color: #fff;
+      box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
+    }
+
+    .btn-tax {
+      background: linear-gradient(135deg, #92400e, #f59e0b);
+      color: #fff;
+    }
+
+    .btn-reset {
+      background: linear-gradient(135deg, #7f1d1d, var(--red));
+      color: #fff;
+    }
+
+    .btn .icon { font-size: 1.5rem; }
+
+    /* ── upgrade shop ── */
+    .section-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 14px;
+    }
+
+    .upgrades {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .upgrade-card {
+      background: var(--card);
+      border: 1px solid #1f2937;
+      border-radius: 14px;
+      padding: 16px;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.1s;
+      position: relative;
+    }
+
+    .upgrade-card:hover:not(.disabled) {
+      border-color: var(--gold);
+      transform: translateY(-2px);
+    }
+
+    .upgrade-card.disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .upgrade-card .u-icon { font-size: 1.6rem; margin-bottom: 6px; }
+    .upgrade-card .u-name { font-size: 0.9rem; font-weight: 700; }
+    .upgrade-card .u-desc { font-size: 0.72rem; color: var(--muted); margin-top: 3px; }
+    .upgrade-card .u-cost {
+      font-size: 0.78rem;
+      color: var(--gold);
+      margin-top: 8px;
+      font-weight: 600;
+    }
+
+    .upgrade-card .u-badge {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 999px;
+    }
+
+    /* ── transaction log ── */
+    .log {
+      background: var(--card);
+      border: 1px solid #1f2937;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .log-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid #1f2937;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .log-list {
+      max-height: 220px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #374151 transparent;
+    }
+
+    .log-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 18px;
+      border-bottom: 1px solid #1f2937;
+      font-size: 0.82rem;
+      animation: slideIn 0.3s ease;
+    }
+
+    .log-item:last-child { border-bottom: none; }
+
+    .log-item .log-desc { color: var(--text); }
+    .log-item .log-time { color: var(--muted); font-size: 0.72rem; margin-top: 2px; }
+    .log-item .log-amt { font-weight: 700; }
+    .log-item .log-amt.pos { color: var(--accent); }
+    .log-item .log-amt.neg { color: var(--red); }
+
+    /* ── auto-earn ticker ── */
+    .auto-ticker {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin: 14px 0;
+    }
+
+    .auto-ticker span {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* ── toast ── */
+    #toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+      z-index: 999;
+      transition: transform 0.3s cubic-bezier(.34,1.56,.64,1);
+      white-space: nowrap;
+    }
+
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ── animations ── */
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-12px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes float {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 0.9; }
+      100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+    }
+
+    @media (max-width: 480px) {
+      .stats  { grid-template-columns: 1fr 1fr; }
+      .stats .stat-box:last-child { grid-column: span 2; }
+      .upgrades { grid-template-columns: 1fr; }
+      .actions  { grid-template-columns: 1fr; }
+      .btn-print { grid-column: span 1; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="particle-canvas"></canvas>
+
+<div class="container">
+  <header>
+    <div class="logo">💰</div>
+    <h1>Phantomark Bank</h1>
+    <p>Printing fictional currency since the beginning of imagination</p>
+  </header>
+
+  <!-- balance -->
+  <div class="balance-card">
+    <div class="balance-label">Total Phantomarks</div>
+    <div class="balance-amount" id="balance">0</div>
+    <div class="currency-tag">PTM — Not legal tender anywhere in the universe</div>
+  </div>
+
+  <!-- stats -->
+  <div class="stats">
+    <div class="stat-box">
+      <div class="val" id="stat-per-click">+1</div>
+      <div class="lbl">Per Click</div>
+    </div>
+    <div class="stat-box">
+      <div class="val" id="stat-per-sec">0</div>
+      <div class="lbl">PTM / sec</div>
+    </div>
+    <div class="stat-box">
+      <div class="val" id="stat-total">0</div>
+      <div class="lbl">All Time</div>
+    </div>
+  </div>
+
+  <!-- main actions -->
+  <div class="actions">
+    <button class="btn btn-print" id="btn-print" onclick="printMoney()">
+      <span class="icon">🖨️</span>
+      PRINT PHANTOMARKS
+    </button>
+    <button class="btn btn-double" onclick="doublePrint()">
+      <span class="icon">✖️2</span>
+      Double Print
+    </button>
+    <button class="btn btn-invest" onclick="investMoney()">
+      <span class="icon">📈</span>
+      Phantom Invest
+    </button>
+    <button class="btn btn-tax" onclick="taxRefund()">
+      <span class="icon">📋</span>
+      Tax Refund
+    </button>
+    <button class="btn btn-reset" onclick="confirmReset()">
+      <span class="icon">🗑️</span>
+      Reset Vault
+    </button>
+  </div>
+
+  <div class="auto-ticker" id="auto-ticker" style="display:none">
+    Auto-printers generating <span id="auto-rate">0</span> PTM/sec
+  </div>
+
+  <!-- upgrades -->
+  <div class="section-title">Upgrades</div>
+  <div class="upgrades" id="upgrades-grid"></div>
+
+  <!-- log -->
+  <div class="log">
+    <div class="log-header">Transaction History</div>
+    <div class="log-list" id="log-list">
+      <div class="log-item">
+        <div>
+          <div class="log-desc">Account opened — welcome to Phantomark!</div>
+          <div class="log-time">Just now</div>
+        </div>
+        <div class="log-amt pos">+0 PTM</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── state ──────────────────────────────────────────────────
+const state = {
+  balance: 0,
+  allTime: 0,
+  clickPower: 1,
+  autoPerSec: 0,
+  upgrades: {
+    printer:    { name: 'Inkjet Printer',     icon: '🖨️',  desc: '+5 per click',         cost: 50,   bought: 0, max: 10 },
+    laser:      { name: 'Laser Press',        icon: '⚡',   desc: '+25 per click',        cost: 300,  bought: 0, max: 5  },
+    robot:      { name: 'Robot Worker',       icon: '🤖',  desc: '+2 PTM/sec',           cost: 150,  bought: 0, max: 20 },
+    factory:    { name: 'Ghost Factory',      icon: '🏭',  desc: '+15 PTM/sec',          cost: 1000, bought: 0, max: 10 },
+    quantum:    { name: 'Quantum Duplicator', icon: '🌀',  desc: '+100 PTM/sec',         cost: 8000, bought: 0, max: 5  },
+    blackhole:  { name: 'Money Black Hole',   icon: '🕳️',  desc: '+1000 PTM/sec',        cost: 75000, bought: 0, max: 3 },
+  }
+};
+
+// ── formatting ─────────────────────────────────────────────
+function fmt(n) {
+  if (n >= 1e15) return (n / 1e15).toFixed(2) + ' Quadrillion';
+  if (n >= 1e12) return (n / 1e12).toFixed(2) + ' Trillion';
+  if (n >= 1e9)  return (n / 1e9).toFixed(2)  + ' Billion';
+  if (n >= 1e6)  return (n / 1e6).toFixed(2)  + ' Million';
+  if (n >= 1e3)  return (n / 1e3).toFixed(1)  + 'K';
+  return Math.floor(n).toLocaleString();
+}
+
+// ── DOM refs ───────────────────────────────────────────────
+const balEl    = document.getElementById('balance');
+const pcEl     = document.getElementById('stat-per-click');
+const psEl     = document.getElementById('stat-per-sec');
+const atEl     = document.getElementById('stat-total');
+const logList  = document.getElementById('log-list');
+const autoTick = document.getElementById('auto-ticker');
+const autoRate = document.getElementById('auto-rate');
+
+// ── render ─────────────────────────────────────────────────
+function render() {
+  balEl.textContent = fmt(state.balance);
+  pcEl.textContent  = '+' + fmt(state.clickPower);
+  psEl.textContent  = fmt(state.autoPerSec);
+  atEl.textContent  = fmt(state.allTime);
+  if (state.autoPerSec > 0) {
+    autoTick.style.display = 'block';
+    autoRate.textContent = fmt(state.autoPerSec);
+  }
+  renderUpgrades();
+}
+
+// ── upgrades grid ──────────────────────────────────────────
+function renderUpgrades() {
+  const grid = document.getElementById('upgrades-grid');
+  grid.innerHTML = '';
+  for (const [id, u] of Object.entries(state.upgrades)) {
+    const affordable = state.balance >= u.cost;
+    const maxed = u.bought >= u.max;
+    const card = document.createElement('div');
+    card.className = 'upgrade-card' + ((!affordable || maxed) ? ' disabled' : '');
+    card.innerHTML = `
+      <div class="u-icon">${u.icon}</div>
+      <div class="u-name">${u.name}</div>
+      <div class="u-desc">${u.desc}</div>
+      <div class="u-cost">${maxed ? '✅ MAXED' : '💳 ' + fmt(u.cost) + ' PTM'}</div>
+      ${u.bought > 0 ? `<div class="u-badge">×${u.bought}</div>` : ''}
+    `;
+    if (affordable && !maxed) card.onclick = () => buyUpgrade(id);
+    grid.appendChild(card);
+  }
+}
+
+// ── buy upgrade ────────────────────────────────────────────
+function buyUpgrade(id) {
+  const u = state.upgrades[id];
+  if (state.balance < u.cost || u.bought >= u.max) return;
+  state.balance -= u.cost;
+  u.bought++;
+
+  if (id === 'printer')   { state.clickPower += 5; }
+  if (id === 'laser')     { state.clickPower += 25; }
+  if (id === 'robot')     { state.autoPerSec += 2; }
+  if (id === 'factory')   { state.autoPerSec += 15; }
+  if (id === 'quantum')   { state.autoPerSec += 100; }
+  if (id === 'blackhole') { state.autoPerSec += 1000; }
+
+  u.cost = Math.floor(u.cost * 1.6);
+  addLog(`Bought ${u.name}`, -1, 'neg', '-' + fmt(u.cost / 1.6) + ' PTM');
+  toast(`${u.icon} ${u.name} acquired!`);
+  render();
+}
+
+// ── core actions ───────────────────────────────────────────
+function earn(amount, label) {
+  state.balance += amount;
+  state.allTime  += amount;
+  addLog(label, amount, 'pos', '+' + fmt(amount) + ' PTM');
+  balEl.classList.add('pulse');
+  setTimeout(() => balEl.classList.remove('pulse'), 120);
+  spawnBills(Math.min(8, Math.floor(amount / state.clickPower) + 1));
+  render();
+}
+
+function printMoney() {
+  earn(state.clickPower, 'Printed Phantomarks');
+}
+
+function doublePrint() {
+  const cost = Math.max(10, state.clickPower * 2);
+  if (state.balance < cost) { toast('⚠️ Not enough PTM!'); return; }
+  state.balance -= cost;
+  earn(state.clickPower * 2, 'Double Print activated');
+}
+
+function investMoney() {
+  const cost = Math.floor(state.balance * 0.3);
+  if (cost < 1) { toast('⚠️ Need more PTM to invest!'); return; }
+  const mult = 0.5 + Math.random() * 2.5;
+  const profit = Math.floor(cost * mult);
+  state.balance -= cost;
+  earn(profit, `Phantom Investment (×${mult.toFixed(2)})`);
+  if (profit < cost) toast('📉 Bad investment… try again!');
+  else toast(`📈 Investment returned ${fmt(profit)} PTM!`);
+}
+
+function taxRefund() {
+  const refund = Math.floor(state.allTime * 0.05 + 100);
+  earn(refund, 'Phantomland Tax Refund');
+  toast(`🏛️ Gov't refunded ${fmt(refund)} PTM!`);
+}
+
+function confirmReset() {
+  if (!confirm('Are you sure? This will erase ALL your Phantomarks!')) return;
+  state.balance = 0;
+  state.allTime = 0;
+  state.clickPower = 1;
+  state.autoPerSec = 0;
+  for (const u of Object.values(state.upgrades)) {
+    u.bought = 0;
+    // reset costs
+  }
+  // full cost reset
+  const base = { printer:50, laser:300, robot:150, factory:1000, quantum:8000, blackhole:75000 };
+  for (const [id, c] of Object.entries(base)) state.upgrades[id].cost = c;
+  logList.innerHTML = '';
+  addLog('Vault reset — starting fresh', 0, 'neg', '0 PTM');
+  toast('🗑️ Vault wiped. Build again!');
+  autoTick.style.display = 'none';
+  render();
+}
+
+// ── auto earn ─────────────────────────────────────────────
+setInterval(() => {
+  if (state.autoPerSec <= 0) return;
+  state.balance += state.autoPerSec;
+  state.allTime  += state.autoPerSec;
+  balEl.classList.add('pulse');
+  setTimeout(() => balEl.classList.remove('pulse'), 100);
+  render();
+}, 1000);
+
+// ── transaction log ────────────────────────────────────────
+function addLog(desc, amount, cls, display) {
+  const item = document.createElement('div');
+  item.className = 'log-item';
+  const now = new Date().toLocaleTimeString();
+  item.innerHTML = `
+    <div>
+      <div class="log-desc">${desc}</div>
+      <div class="log-time">${now}</div>
+    </div>
+    <div class="log-amt ${cls}">${display}</div>
+  `;
+  logList.prepend(item);
+  // keep last 30
+  while (logList.children.length > 30) logList.removeChild(logList.lastChild);
+}
+
+// ── toast ──────────────────────────────────────────────────
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ── floating bill particles ────────────────────────────────
+const canvas = document.getElementById('particle-canvas');
+const ctx    = canvas.getContext('2d');
+const bills  = [];
+
+function resize() {
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+function spawnBills(n) {
+  for (let i = 0; i < n; i++) {
+    bills.push({
+      x: Math.random() * canvas.width,
+      y: canvas.height + 20,
+      size: 18 + Math.random() * 18,
+      speed: 1.5 + Math.random() * 3,
+      spin: (Math.random() - 0.5) * 0.15,
+      angle: 0,
+      vx: (Math.random() - 0.5) * 2,
+      life: 1,
+      char: ['💵', '💴', '💶', '💷', '💸'][Math.floor(Math.random() * 5)]
+    });
+  }
+}
+
+function animateBills() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let i = bills.length - 1; i >= 0; i--) {
+    const b = bills[i];
+    b.y    -= b.speed;
+    b.x    += b.vx;
+    b.angle += b.spin;
+    b.life  -= 0.008;
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, b.life);
+    ctx.font = b.size + 'px serif';
+    ctx.translate(b.x, b.y);
+    ctx.rotate(b.angle);
+    ctx.fillText(b.char, -b.size / 2, b.size / 2);
+    ctx.restore();
+    if (b.life <= 0 || b.y < -40) bills.splice(i, 1);
+  }
+  requestAnimationFrame(animateBills);
+}
+animateBills();
+
+// ── auto-spawn ambient bills ───────────────────────────────
+setInterval(() => spawnBills(1), 2000);
+
+// ── init ───────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
